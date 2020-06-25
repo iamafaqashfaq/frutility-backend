@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using frutility_backend.Data;
 
 namespace frutility_backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200624155330_AddedCategories")]
+    partial class AddedCategories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -269,142 +271,6 @@ namespace frutility_backend.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("frutility_backend.Data.Model.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OrderStatus")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentMethod")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("frutility_backend.Data.Model.ProductReviews", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quality")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Review")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ReviewDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductReviews");
-                });
-
-            modelBuilder.Entity("frutility_backend.Data.Model.Products", b =>
-                {
-                    b.Property<int>("ProductID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CategoryID")
-                        .HasColumnType("int");
-
-                    b.Property<double>("PackageWeight")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("PostingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<bool>("ProductAvailability")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProductDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductImage1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductImage2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductImage3")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("ProductPriceBeforeDiscount")
-                        .HasColumnType("float");
-
-                    b.Property<int>("ProductStock")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductVendor")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("ShippingCharges")
-                        .HasColumnType("float");
-
-                    b.Property<int>("SubCategoryID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdataionDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ProductID");
-
-                    b.HasIndex("CategoryID");
-
-                    b.HasIndex("SubCategoryID");
-
-                    b.ToTable("Products");
-                });
-
             modelBuilder.Entity("frutility_backend.Data.Model.SubCategory", b =>
                 {
                     b.Property<int>("SubCategoryID")
@@ -478,43 +344,6 @@ namespace frutility_backend.Migrations
                     b.HasOne("frutility_backend.Data.Model.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("frutility_backend.Data.Model.Order", b =>
-                {
-                    b.HasOne("frutility_backend.Data.Model.Products", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("frutility_backend.Data.Model.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("frutility_backend.Data.Model.ProductReviews", b =>
-                {
-                    b.HasOne("frutility_backend.Data.Model.Products", "Products")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("frutility_backend.Data.Model.Products", b =>
-                {
-                    b.HasOne("frutility_backend.Data.Model.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("frutility_backend.Data.Model.SubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

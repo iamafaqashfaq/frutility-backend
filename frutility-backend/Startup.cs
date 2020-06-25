@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using frutility_backend.Data.Model;
 
 namespace frutility_backend
 {
@@ -31,7 +32,7 @@ namespace frutility_backend
             string connection = Configuration.GetConnectionString("Default");
             services.AddControllers();
             services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
-            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
              {
                  options.Password.RequireDigit = false;
                  options.Password.RequireNonAlphanumeric = false;

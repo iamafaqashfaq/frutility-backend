@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using frutility_backend.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using frutility_backend.Data.Model;
 
 namespace frutility_backend
 {
@@ -22,7 +23,7 @@ namespace frutility_backend
             using(var services = host.Services.CreateScope())
             {
                 var dbcontext = services.ServiceProvider.GetRequiredService<DataContext>();
-                var usermgr = services.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var usermgr = services.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                 var rolemgr = services.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 dbcontext.Database.Migrate();
                 var adminrole = new IdentityRole("Admin");
@@ -32,7 +33,7 @@ namespace frutility_backend
                 }
                 if(!dbcontext.Users.Any(u=>u.UserName == "admin"))
                 {
-                    var adminUser = new IdentityUser
+                    var adminUser = new ApplicationUser
                     {
                         UserName = "admin@frutility.com",
                         Email = "admin@frutility.com"
