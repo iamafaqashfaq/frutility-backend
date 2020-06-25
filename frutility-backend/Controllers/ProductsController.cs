@@ -24,18 +24,23 @@ namespace frutility_backend.Controllers
             _context = context;
         }
 
+        // Get: /api/products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Products>>> GetProducts()
         {
             var productlist = await _context.Products.ToListAsync();
             return Ok(productlist);
         }
+
+        //Get: api/products/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Products>> GetProductItem(int id)
         {
             var productitem = await _context.Products.FindAsync(id);
             return productitem;
         }
+
+        //Post: api/products
         [HttpPost]
         public async Task<ActionResult<Products>> PostProducts(Products productsrec)
         {
@@ -46,6 +51,33 @@ namespace frutility_backend.Controllers
             _context.Products.Add(productsrec);
             await _context.SaveChangesAsync();
             return Ok();
+        }
+
+        //Put: api/products/{id}
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Products>> UpdateProducts(int id, Products productsrec)
+        {
+            if(id != productsrec.ProductID)
+            {
+                return BadRequest();
+            }
+            _context.Entry(productsrec).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        //Delete: api/products/{id}
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Products>> DeleteProducts(int id)
+        {
+            Products products = await _context.Products.FindAsync(id);
+            if(products == null)
+            {
+                return BadRequest();
+            }
+            _context.Products.Remove(products);
+            await _context.SaveChangesAsync();
+            return products;
         }
     }
 }

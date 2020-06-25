@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,6 +39,7 @@ namespace frutility_backend
                  options.Password.RequireUppercase = false;
                  options.Password.RequiredLength = 6;
              }).AddEntityFrameworkStores<DataContext>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
