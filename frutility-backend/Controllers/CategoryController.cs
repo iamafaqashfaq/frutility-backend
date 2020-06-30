@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Threading.Tasks;
 using frutility_backend.Data;
 using frutility_backend.Data.Model;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient.DataClassification;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace frutility_backend.Controllers
 {
+    [EnableCors("AllowOrigin")]
     [Route("api/category")]
     [ApiController]
     public class CategoryController : ControllerBase

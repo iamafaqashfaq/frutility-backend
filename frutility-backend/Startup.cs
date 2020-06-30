@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using frutility_backend.Data.Model;
+using Microsoft.Net.Http.Headers;
 
 namespace frutility_backend
 {
@@ -29,6 +30,16 @@ namespace frutility_backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options =>
+                options.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod().Build());
+
+                //c.AddPolicy("AllowOrigin", options => 
+                //options.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod());
+            });
             string connection = Configuration.GetConnectionString("Default");
             services.AddControllers();
             services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
@@ -40,19 +51,29 @@ namespace frutility_backend
                  options.Password.RequiredLength = 6;
              }).AddEntityFrameworkStores<DataContext>();
 
+            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            //app.UseCors(options => options.WithOrigins("http://localhost:3000"));
+
+
             app.UseHttpsRedirection();
 
+
             app.UseRouting();
+
+            app.UseCors("AllowOrigin");
+
 
             app.UseAuthorization();
 

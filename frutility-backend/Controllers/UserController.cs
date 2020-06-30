@@ -5,12 +5,14 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using frutility_backend.Data.Model;
 using frutility_backend.Data.ViewModel;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace frutility_backend.Controllers
 {
+    [EnableCors("AllowOrigin")]
     [Route("api/usercontroller")]
     [ApiController]
     public class UserController : ControllerBase
@@ -53,6 +55,7 @@ namespace frutility_backend.Controllers
                 }
             }
             return NoContent();
+            //return Ok(true);
         }
 
         [Route("signout")]
