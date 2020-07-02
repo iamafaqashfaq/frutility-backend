@@ -33,12 +33,10 @@ namespace frutility_backend
             services.AddCors(c =>
             {
                 c.AddPolicy("AllowOrigin", options =>
-                options.AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod().Build());
-
-                //c.AddPolicy("AllowOrigin", options => 
-                //options.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod());
+                options.AllowAnyHeader()
+                .AllowAnyMethod().
+                AllowCredentials()
+                .WithOrigins("http://localhost:3000"));
             });
             string connection = Configuration.GetConnectionString("Default");
             services.AddControllers();
@@ -51,7 +49,7 @@ namespace frutility_backend
                  options.Password.RequiredLength = 6;
              }).AddEntityFrameworkStores<DataContext>();
 
-            
+            services.AddAuthentication();
 
         }
 
@@ -64,16 +62,13 @@ namespace frutility_backend
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseCors(options => options.WithOrigins("http://localhost:3000"));
-
-
             app.UseHttpsRedirection();
-
 
             app.UseRouting();
 
             app.UseCors("AllowOrigin");
 
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

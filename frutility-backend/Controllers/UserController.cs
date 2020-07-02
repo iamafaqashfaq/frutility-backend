@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using frutility_backend.Data;
 using frutility_backend.Data.Model;
 using frutility_backend.Data.ViewModel;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace frutility_backend.Controllers
 {
@@ -19,11 +21,13 @@ namespace frutility_backend.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly DataContext _context;
         public UserController(UserManager<ApplicationUser> usermanager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager, DataContext context)
         {
             _userManager = usermanager;
             _signInManager = signInManager;
+            _context = context;
         }
         [Route("register")]
         [HttpPost]
@@ -43,7 +47,7 @@ namespace frutility_backend.Controllers
         }
         [Route("login")]
         [HttpPost]
-        public async Task<IActionResult> LoginUser(ApplicationUserVM model)
+        public async Task<IActionResult> LoginUser(AppLogin model)
         {
             if (ModelState.IsValid)
             {
@@ -51,11 +55,27 @@ namespace frutility_backend.Controllers
                     , false, false);
                 if (result.Succeeded)
                 {
-                    return Ok();
+                    string id = _userManager.GetUserId(User);
+                    ApplicationUser user = await _context.Users.FindAsync(id);
+                    return Ok(new {
+                        user.Id,
+                        user.UserName
+                    });
                 }
             }
             return NoContent();
-            //return Ok(true);
+        }
+
+        [Route("checkuser")]
+        [HttpGet]
+        public ActionResult<IEnumerable<ApplicationUser>> CheckLogin()
+        {
+            var result = User.Identity.IsAuthenticated;
+            if (result)
+            {
+                return Ok(User.Identity.Name);
+            }
+            return Ok(false);
         }
 
         [Route("signout")]
@@ -63,7 +83,7 @@ namespace frutility_backend.Controllers
         public async Task<IActionResult> SignOut()
         {
             await _signInManager.SignOutAsync();
-            return Ok();
+            return Ok(true);
         }
 
 
