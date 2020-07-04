@@ -15,6 +15,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using frutility_backend.Data.Model;
 using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace frutility_backend
 {
@@ -30,6 +33,8 @@ namespace frutility_backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //Setting CORS Policies
             services.AddCors(c =>
             {
                 c.AddPolicy("AllowOrigin", options =>
@@ -38,6 +43,8 @@ namespace frutility_backend
                 AllowCredentials()
                 .WithOrigins("http://localhost:3000"));
             });
+
+            //Adding DATABASE
             string connection = Configuration.GetConnectionString("Default");
             services.AddControllers();
             services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
@@ -49,7 +56,25 @@ namespace frutility_backend
                  options.Password.RequiredLength = 6;
              }).AddEntityFrameworkStores<DataContext>();
 
-            services.AddAuthentication();
+
+            //Adding JWT in Server
+            var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
         }
 
