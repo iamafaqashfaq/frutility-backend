@@ -66,6 +66,70 @@ namespace frutility_backend.Controllers
             return Ok(decoded);
         }
 
+
+        [Authorize]
+        [Route("pendingorders")]
+        [HttpPost]
+        public async Task<ActionResult<IEnumerable<Order>>> GetPendingOrders(Token token)
+        {
+            DecodeToken dt = new DecodeToken();
+            var decoded = dt.TokenDecoder(token.entoken);
+            var user = await _userManager.FindByIdAsync(decoded.Value);
+            var result = _userManager.GetRolesAsync(user);
+            if (result.Result.Contains("Admin"))
+            {
+                var order = await (from s in _context.Orders
+                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "pending")
+                                   select new OrdersDetailsVM
+                                   {
+                                       Id = s.Id,
+                                       Name = s.ApplicationUser.UserName,
+                                       Email = s.ApplicationUser.Email,
+                                       Phone = s.ApplicationUser.PhoneNumber,
+                                       Address = s.ApplicationUser.ShippingAddress,
+                                       Product = s.Products.ProductName,
+                                       Quantity = s.Quantity,
+                                       Amount = s.Products.Price * s.Quantity,
+                                       OrderDate = s.OrderDate,
+                                       PaymentMethod = s.PaymentMethod,
+                                       OrderStatus = s.OrderStatus
+                                   }).ToListAsync();
+                return Ok(order);
+            }
+            return Ok(decoded);
+        }
+
+        [Authorize]
+        [Route("deliveredorders")]
+        [HttpPost]
+        public async Task<ActionResult<IEnumerable<Order>>> DeliveredOrders(Token token)
+        {
+            DecodeToken dt = new DecodeToken();
+            var decoded = dt.TokenDecoder(token.entoken);
+            var user = await _userManager.FindByIdAsync(decoded.Value);
+            var result = _userManager.GetRolesAsync(user);
+            if (result.Result.Contains("Admin"))
+            {
+                var order = await (from s in _context.Orders
+                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "Delivered")
+                                   select new OrdersDetailsVM
+                                   {
+                                       Id = s.Id,
+                                       Name = s.ApplicationUser.UserName,
+                                       Email = s.ApplicationUser.Email,
+                                       Phone = s.ApplicationUser.PhoneNumber,
+                                       Address = s.ApplicationUser.ShippingAddress,
+                                       Product = s.Products.ProductName,
+                                       Quantity = s.Quantity,
+                                       Amount = s.Products.Price * s.Quantity,
+                                       OrderDate = s.OrderDate,
+                                       PaymentMethod = s.PaymentMethod,
+                                       OrderStatus = s.OrderStatus
+                                   }).ToListAsync();
+                return Ok(order);
+            }
+            return Ok(decoded);
+        }
         //Get: api/orders/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByUserID(string id)
