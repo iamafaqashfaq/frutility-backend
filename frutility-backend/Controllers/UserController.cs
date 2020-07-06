@@ -98,8 +98,7 @@ namespace frutility_backend.Controllers
             {
                 ApplicationUser user = await _userManager.FindByNameAsync(model.UserName);
                 var checkRole = _userManager.GetRolesAsync(user);
-                bool check = checkRole.Result.Contains("Admin");
-                if (check)
+                if (checkRole.Result.Contains("Admin"))
                 {
                     var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password
                         ,false, false);

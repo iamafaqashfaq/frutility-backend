@@ -5,7 +5,11 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using frutility_backend.Data;
 using frutility_backend.Data.Model;
+using frutility_backend.Data.ViewModel;
+using frutility_backend.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,10 +20,11 @@ namespace frutility_backend.Controllers
     public class OrderController : ControllerBase
     {
         private readonly DataContext _context;
-
-        public OrderController(DataContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public OrderController(DataContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         //Get: api/orders
@@ -27,6 +32,38 @@ namespace frutility_backend.Controllers
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             return await _context.Orders.ToListAsync();
+        }
+
+        [Authorize]
+        [Route("todayorders")]
+        [HttpPost]
+        public async Task<ActionResult<IEnumerable<Order>>> GetTodayOrders(Token token)
+        {
+            DecodeToken dt = new DecodeToken();
+            var decoded = dt.TokenDecoder(token.entoken);
+            var user = await _userManager.FindByIdAsync(decoded.Value);
+            var result = _userManager.GetRolesAsync(user);
+            if (result.Result.Contains("Admin"))
+            {
+                var order = await (from s in _context.Orders
+                                   where s.OrderDate.Date == DateTime.Now.Date
+                                   select new OrdersDetailsVM
+                                   {
+                                       Id = s.Id,
+                                       Name = s.ApplicationUser.UserName,
+                                       Email = s.ApplicationUser.Email,
+                                       Phone = s.ApplicationUser.PhoneNumber,
+                                       Address = s.ApplicationUser.ShippingAddress,
+                                       Product = s.Products.ProductName,
+                                       Quantity = s.Quantity,
+                                       Amount = s.Products.Price * s.Quantity,
+                                       OrderDate = s.OrderDate,
+                                       PaymentMethod = s.PaymentMethod,
+                                       OrderStatus = s.OrderStatus
+                                   }).ToListAsync();
+                return Ok(order);
+            }
+            return Ok(decoded);
         }
 
         //Get: api/orders/{id}
