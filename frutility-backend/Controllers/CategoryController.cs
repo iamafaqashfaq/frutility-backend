@@ -45,7 +45,7 @@ namespace frutility_backend.Controllers
         // Post: api/category
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category categoryrec)
+        public async Task<IActionResult> PostCategory(Category categoryrec)
         {
             if (!ModelState.IsValid)
             {
@@ -60,7 +60,7 @@ namespace frutility_backend.Controllers
         // Put: api/category/{id}
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<ActionResult<Category>> UpdateCategory(long id, Category categoryrec)
+        public async Task<IActionResult> UpdateCategory(long id, Category categoryrec)
         {
             if(id != categoryrec.Id)
             {
@@ -73,8 +73,9 @@ namespace frutility_backend.Controllers
         }
 
         // Delete: /api/category/{id}
+        [Authorize]
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Category>> DeleteCategory(int id)
+        public async Task<IActionResult> DeleteCategory(int id)
         {
             Category category = await _context.Categories.FindAsync(id);
             if(category == null)
@@ -83,7 +84,7 @@ namespace frutility_backend.Controllers
             }
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
-            return category;
+            return Ok(true);
         }
     }
 }

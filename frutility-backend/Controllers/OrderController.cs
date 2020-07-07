@@ -35,6 +35,35 @@ namespace frutility_backend.Controllers
         }
 
         [Authorize]
+        [Route("todayorderscount")]
+        [HttpGet]
+        public ActionResult<int> GetTodayCount()
+        {
+            int order = _context.Orders.Where(o => o.OrderDate.Date ==
+            DateTime.Now.Date && o.OrderStatus == "Pending").Count();
+            return order;
+        }
+
+        [Authorize]
+        [Route("pendingorderscount")]
+        [HttpGet]
+        public ActionResult<int> GetPendingCount()
+        {
+            int order = _context.Orders.Where(o => o.OrderDate.Date !=
+            DateTime.Now.Date || o.OrderStatus == "Dispatched").Count();
+            return order;
+        }
+
+        [Authorize]
+        [Route("deliveredorderscount")]
+        [HttpGet]
+        public ActionResult<int> GetDeliveredCount()
+        {
+            int order = _context.Orders.Where(o => o.OrderStatus == "Delivered").Count();
+            return order;
+        }
+
+        [Authorize]
         [Route("todayorders")]
         [HttpPost]
         public async Task<ActionResult<IEnumerable<Order>>> GetTodayOrders(Token token)
