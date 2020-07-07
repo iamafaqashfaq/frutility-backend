@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Threading.Tasks;
 using frutility_backend.Data;
 using frutility_backend.Data.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,7 @@ namespace frutility_backend.Controllers
         }
 
         // Post: api/category
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Category>> PostCategory(Category categoryrec)
         {
@@ -49,22 +51,27 @@ namespace frutility_backend.Controllers
             {
                 return BadRequest("Invalid Data");
             }
+            categoryrec.CreationDate = DateTime.Now;
             _context.Categories.Add(categoryrec);
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok(true);
         }
 
         // Put: api/category/{id}
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<ActionResult<Category>> UpdateCategory(int id, Category categoryrec)
+        public async Task<ActionResult<Category>> UpdateCategory(Category categoryrec)
         {
-            if(id != categoryrec.Id)
+            var categories = await _context.Categories.FindAsync(categoryrec.Id);
+            if(categories == null)
             {
                 return BadRequest();
             }
+            categories = null;
+            categoryrec.UpdationDate = DateTime.Now;
             _context.Entry(categoryrec).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return NoContent();
+            return Ok(true);
         }
 
         // Delete: /api/category/{id}
