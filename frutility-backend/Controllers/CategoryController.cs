@@ -60,14 +60,12 @@ namespace frutility_backend.Controllers
         // Put: api/category/{id}
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<ActionResult<Category>> UpdateCategory(Category categoryrec)
+        public async Task<ActionResult<Category>> UpdateCategory(long id, Category categoryrec)
         {
-            var categories = await _context.Categories.FindAsync(categoryrec.Id);
-            if(categories == null)
+            if(id != categoryrec.Id)
             {
                 return BadRequest();
             }
-            categories = null;
             categoryrec.UpdationDate = DateTime.Now;
             _context.Entry(categoryrec).State = EntityState.Modified;
             await _context.SaveChangesAsync();
