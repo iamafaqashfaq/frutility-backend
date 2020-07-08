@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using frutility_backend.Data;
 using frutility_backend.Data.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,17 @@ namespace frutility_backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SubCategory>>> GetSubcategory()
         {
-            return await _context.SubCategories.ToListAsync();
+            var subcategory = await (from s in _context.SubCategories
+                                     select new
+                                     {
+                                         s.SubCategoryID,
+                                         s.SubCategoryName,
+                                         s.CategoryID,
+                                         s.Category.CategoryName,
+                                         s.CreationDate,
+                                         s.UpdationDate
+                                     }).ToListAsync();
+            return Ok(subcategory);
         }
 
         //Get: api/subcategory/{id}
@@ -41,6 +52,7 @@ namespace frutility_backend.Controllers
         }
 
         //POST: api/subcategory
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<SubCategory>> PostSubcategory(SubCategory subCategory)
         {
@@ -48,27 +60,31 @@ namespace frutility_backend.Controllers
             {
                 return BadRequest("Invalid Data");
             }
+            subCategory.CreationDate = DateTime.Now;
             _context.SubCategories.Add(subCategory);
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok(true);
         }
 
         //PUT: api/subcategory/{id}
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<ActionResult<SubCategory>> UpdateSubcategory(int id, SubCategory subCategoryrec)
+        public async Task<ActionResult<SubCategory>> UpdateSubcategory(long id, SubCategory subCategoryrec)
         {
             if(id != subCategoryrec.SubCategoryID)
             {
                 return BadRequest("Invalid Data");
             }
+            subCategoryrec.UpdationDate = DateTime.Now;
             _context.Entry(subCategoryrec).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return NoContent();
+            return Ok(true);
         }
 
         //Delete: api/subcategory/{id}
+        [Authorize]
         [HttpDelete("{id}")]
-        public async Task<ActionResult<SubCategory>> DeleteSubcategory(int id)
+        public async Task<ActionResult> DeleteSubcategory(int id)
         {
             SubCategory subCategory = await _context.SubCategories.FindAsync(id);
             if(subCategory == null)
@@ -77,7 +93,7 @@ namespace frutility_backend.Controllers
             }
             _context.SubCategories.Remove(subCategory);
             await _context.SaveChangesAsync();
-            return subCategory;
+            return Ok(true);
         }
     }
 }
