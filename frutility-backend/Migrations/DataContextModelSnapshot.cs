@@ -252,14 +252,14 @@ namespace frutility_backend.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CategoryDescription")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CategoryName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdationDate")
                         .HasColumnType("datetime2");
@@ -343,13 +343,31 @@ namespace frutility_backend.Migrations
 
             modelBuilder.Entity("frutility_backend.Data.Model.Products", b =>
                 {
-                    b.Property<int>("ProductID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("Availability")
+                        .HasColumnType("bit");
+
                     b.Property<int>("CategoryID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("PackageWeight")
                         .HasColumnType("float");
@@ -360,35 +378,14 @@ namespace frutility_backend.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<bool>("ProductAvailability")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProductDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductImage1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductImage2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductImage3")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("ProductPriceBeforeDiscount")
+                    b.Property<double?>("PriceBeforeDiscount")
                         .HasColumnType("float");
-
-                    b.Property<int>("ProductStock")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductVendor")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("ShippingCharges")
                         .HasColumnType("float");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
 
                     b.Property<int>("SubCategoryID")
                         .HasColumnType("int");
@@ -396,7 +393,10 @@ namespace frutility_backend.Migrations
                     b.Property<DateTime>("UpdataionDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("ProductID");
+                    b.Property<string>("Vendor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CategoryID");
 
@@ -407,7 +407,7 @@ namespace frutility_backend.Migrations
 
             modelBuilder.Entity("frutility_backend.Data.Model.SubCategory", b =>
                 {
-                    b.Property<int>("SubCategoryID")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -418,13 +418,13 @@ namespace frutility_backend.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SubCategoryName")
+                    b.Property<string>("SubcategoryName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdationDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("SubCategoryID");
+                    b.HasKey("ID");
 
                     b.HasIndex("CategoryID");
 

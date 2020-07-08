@@ -28,7 +28,29 @@ namespace frutility_backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Products>>> GetProducts()
         {
-            var productlist = await _context.Products.ToListAsync();
+            var productlist = await (from p in _context.Products
+                                     select new
+                                     {
+                                         p.Id,
+                                         p.Name,
+                                         p.Description,
+                                         p.Vendor,
+                                         p.Price,
+                                         p.PriceBeforeDiscount,
+                                         p.Image1,
+                                         p.Image2,
+                                         p.Image3,
+                                         p.ShippingCharges,
+                                         p.Availability,
+                                         p.Stock,
+                                         p.PostingDate,
+                                         p.UpdataionDate,
+                                         p.PackageWeight,
+                                         p.SubCategoryID,
+                                         p.SubCategory.SubcategoryName,
+                                         p.CategoryID,
+                                         p.Category.CategoryName
+                                     }).ToListAsync();
             return Ok(productlist);
         }
 
@@ -57,7 +79,7 @@ namespace frutility_backend.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Products>> UpdateProducts(int id, Products productsrec)
         {
-            if(id != productsrec.ProductID)
+            if(id != productsrec.Id)
             {
                 return BadRequest();
             }

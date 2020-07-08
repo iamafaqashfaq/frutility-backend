@@ -9,7 +9,7 @@ namespace frutility_backend.Data.Model
     {
         public int Id { get; set; }
         public string CategoryName { get; set; }
-        public string CategoryDescription { get; set; }
+        public string Description { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdationDate { get; set; }
     }

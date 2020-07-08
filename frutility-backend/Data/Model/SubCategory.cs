@@ -8,8 +8,8 @@ namespace frutility_backend.Data.Model
 {
     public class SubCategory
     {
-        public int SubCategoryID { get; set; }
-        public string SubCategoryName { get; set; }
+        public int ID { get; set; }
+        public string SubcategoryName { get; set; }
         [ForeignKey("Category")]
         public int CategoryID { get; set; }
         public Category Category { get; set; }

@@ -29,8 +29,8 @@ namespace frutility_backend.Controllers
             var subcategory = await (from s in _context.SubCategories
                                      select new
                                      {
-                                         s.SubCategoryID,
-                                         s.SubCategoryName,
+                                         s.ID,
+                                         s.SubcategoryName,
                                          s.CategoryID,
                                          s.Category.CategoryName,
                                          s.CreationDate,
@@ -71,7 +71,7 @@ namespace frutility_backend.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<SubCategory>> UpdateSubcategory(long id, SubCategory subCategoryrec)
         {
-            if(id != subCategoryrec.SubCategoryID)
+            if(id != subCategoryrec.ID)
             {
                 return BadRequest("Invalid Data");
             }

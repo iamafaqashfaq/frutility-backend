@@ -10,18 +10,18 @@ namespace frutility_backend.Data.Model
     public class Products
     {
         [Key]
-        public int ProductID { get; set; }
-        public string ProductName { get; set; }
-        public string ProductDescription { get; set; }
-        public string ProductVendor { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Vendor { get; set; }
         public double Price { get; set; }
-        public double ProductPriceBeforeDiscount { get; set; }
-        public string ProductImage1 { get; set; }
-        public string ProductImage2 { get; set; }
-        public string ProductImage3 { get; set; }
+        public double? PriceBeforeDiscount { get; set; }
+        public string Image1 { get; set; }
+        public string Image2 { get; set; }
+        public string Image3 { get; set; }
         public double ShippingCharges { get; set; }
-        public bool ProductAvailability { get; set; }
-        public int ProductStock { get; set; }
+        public bool Availability { get; set; }
+        public int Stock { get; set; }
         public DateTime PostingDate { get; set; }
         public DateTime UpdataionDate { get; set; }
         public double PackageWeight { get; set; }
