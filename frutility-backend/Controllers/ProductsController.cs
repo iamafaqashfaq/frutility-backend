@@ -62,7 +62,7 @@ namespace frutility_backend.Controllers
 
         //Post: api/products
         [HttpPost]
-        public async Task<ActionResult<Products>> PostProducts(Products productsrec)
+        public async Task<ActionResult<Products>> PostProducts([FromForm]Products productsrec)
         {
             if (!ModelState.IsValid)
             {
