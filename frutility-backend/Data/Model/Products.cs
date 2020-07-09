@@ -23,13 +23,10 @@ namespace frutility_backend.Data.Model
         public bool Availability { get; set; }
         public int Stock { get; set; }
         public DateTime PostingDate { get; set; }
-        public DateTime UpdataionDate { get; set; }
+        public DateTime UpdationDate { get; set; }
         public double PackageWeight { get; set; }
         [ForeignKey("SubCategory")]
         public int SubCategoryID { get; set; }
         public virtual SubCategory SubCategory { get; set; }
-        [ForeignKey("Category")]
-        public int CategoryID { get; set; }
-        public virtual Category Category { get; set; }
     }
 }

@@ -44,12 +44,10 @@ namespace frutility_backend.Controllers
                                          p.Availability,
                                          p.Stock,
                                          p.PostingDate,
-                                         p.UpdataionDate,
+                                         p.UpdationDate,
                                          p.PackageWeight,
                                          p.SubCategoryID,
-                                         p.SubCategory.SubcategoryName,
-                                         p.CategoryID,
-                                         p.Category.CategoryName
+                                         p.SubCategory.SubcategoryName
                                      }).ToListAsync();
             return Ok(productlist);
         }
