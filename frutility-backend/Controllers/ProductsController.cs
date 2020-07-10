@@ -61,41 +61,72 @@ namespace frutility_backend.Controllers
         }
         //async Task<ActionResult<Products>>
         //Get: api/products/{id}
+        //[HttpGet("image/{id}")]
+        //public async Task<IActionResult> GetProductItem(int id)
+        //{
+        //    Products model = _context.Products.FirstOrDefault(p => p.Id == id);
+        //    if(model.Image1 != null)
+        //    {
+        //        string path = "Assests/images/" + model.Image1;
+        //        string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+        //        var memory = new MemoryStream();
+        //        using (var stream = new FileStream(filepath, FileMode.Open))
+        //        {
+        //            await stream.CopyToAsync(memory);
+        //        }
+        //        if(model.Image2 != null)
+        //        {
+        //            path = "Assests/images/" + model.Image2;
+        //            filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+        //            using (var stream = new FileStream(filepath, FileMode.Open))
+        //            {
+        //                await stream.CopyToAsync(memory);
+        //            }
+        //        }
+        //        if (model.Image3 != null)
+        //        {
+        //            path = "Assests/images/" + model.Image3;
+        //            filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+        //            using (var stream = new FileStream(filepath, FileMode.Open))
+        //            {
+        //                await stream.CopyToAsync(memory);
+        //            }
+        //        }
+        //        memory.Position = 1;
+        //        return File(memory, "image/jpeg");
+        //    }
+        //    return NoContent();
+        //}
+
         [HttpGet("image/{id}")]
-        public async Task<IActionResult> GetProductItem(int id)
+        public async Task<List<byte[]>> GetProductItem(int id)
         {
             Products model = _context.Products.FirstOrDefault(p => p.Id == id);
-            if(model.Image1 != null)
+            List<byte[]> imageBytes = new List<byte[]>();
+            if (model.Image1 != null)
             {
                 string path = "Assests/images/" + model.Image1;
                 string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
                 var memory = new MemoryStream();
-                using (var stream = new FileStream(filepath, FileMode.Open))
-                {
-                    await stream.CopyToAsync(memory);
-                }
-                if(model.Image2 != null)
+                byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+                imageBytes.Add(bytes);
+                if (model.Image2 != null)
                 {
                     path = "Assests/images/" + model.Image2;
                     filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
-                    using (var stream = new FileStream(filepath, FileMode.Open))
-                    {
-                        await stream.CopyToAsync(memory);
-                    }
+                    bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+                    imageBytes.Add(bytes);
                 }
                 if (model.Image3 != null)
                 {
                     path = "Assests/images/" + model.Image3;
                     filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
-                    using (var stream = new FileStream(filepath, FileMode.Open))
-                    {
-                        await stream.CopyToAsync(memory);
-                    }
+                    bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+                    imageBytes.Add(bytes);
                 }
-                memory.Position = 1;
-                return File(memory, "image/jpeg");
+                return imageBytes;
             }
-            return NoContent();
+            return imageBytes;
         }
 
 
