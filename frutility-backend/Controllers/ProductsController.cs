@@ -10,6 +10,10 @@ using frutility_backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using frutility_backend.Data.Model;
+using frutility_backend.Data.ViewModel;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace frutility_backend.Controllers
 {
@@ -18,10 +22,12 @@ namespace frutility_backend.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public ProductsController(DataContext context)
+        public ProductsController(DataContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // Get: /api/products
@@ -61,16 +67,59 @@ namespace frutility_backend.Controllers
         }
 
         //Post: api/products
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Products>> PostProducts([FromForm]Products productsrec)
+        public async Task<ActionResult<Products>> PostProducts([FromForm]ProductsViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest("Invalid Data");
             }
-            _context.Products.Add(productsrec);
+            string UniqueFileNameimage1 = null;
+            if (model.Image1 != null)
+            {
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                UniqueFileNameimage1 = Guid.NewGuid().ToString() + "_" + model.Image1.FileName;
+                string filepath = Path.Combine(uploadfolder, UniqueFileNameimage1);
+                await model.Image1.CopyToAsync(new FileStream(filepath, FileMode.Create));
+            }
+            string UniqueFileNameimage2 = null;
+            if (model.Image2 != null)
+            {
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                UniqueFileNameimage2 = Guid.NewGuid().ToString() + "_" + model.Image2.FileName;
+                string filepath = Path.Combine(uploadfolder, UniqueFileNameimage2);
+                await model.Image2.CopyToAsync(new FileStream(filepath, FileMode.Create));
+            }
+            string UniqueFileNameimage3 = null;
+            if (model.Image3 != null)
+            {
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                UniqueFileNameimage3 = Guid.NewGuid().ToString() + "_" + model.Image3.FileName;
+                string filepath = Path.Combine(uploadfolder, UniqueFileNameimage3);
+                await model.Image3.CopyToAsync(new FileStream(filepath, FileMode.Create));
+            }
+            Products products = new Products
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Vendor = model.Vendor,
+                Price = model.Price,
+                PriceBeforeDiscount = model.PriceBeforeDiscount,
+                Image1 = UniqueFileNameimage1,
+                Image2 = UniqueFileNameimage2,
+                Image3 = UniqueFileNameimage3,
+                ShippingCharges = model.ShippingCharges,
+                Availability = model.Availability,
+                Stock = model.Stock,
+                PostingDate = DateTime.Now,
+                UpdationDate = DateTime.Now,
+                PackageWeight = model.PackageWeight,
+                SubCategoryID = model.SubCategoryID
+            };
+            _context.Products.Add(products);
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok(products);
         }
 
         //Put: api/products/{id}

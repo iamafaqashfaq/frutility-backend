@@ -89,6 +89,8 @@ namespace frutility_backend
 
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseCors("AllowOrigin");

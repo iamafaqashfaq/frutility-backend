@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using frutility_backend.Data;
 using frutility_backend.Data.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient.DataClassification;
@@ -20,10 +22,11 @@ namespace frutility_backend.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly DataContext _context;
-
-        public CategoryController(DataContext context)
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public CategoryController(DataContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // Get: api/category
