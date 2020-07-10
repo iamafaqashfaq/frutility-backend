@@ -14,6 +14,8 @@ using frutility_backend.Data.ViewModel;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
+using System.Net.Http;
+using SQLitePCL;
 
 namespace frutility_backend.Controllers
 {
@@ -57,14 +59,46 @@ namespace frutility_backend.Controllers
                                      }).ToListAsync();
             return Ok(productlist);
         }
-
+        //async Task<ActionResult<Products>>
         //Get: api/products/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Products>> GetProductItem(int id)
+        [HttpGet("image/{id}")]
+        public async Task<IActionResult> GetProductItem(int id)
         {
-            var productitem = await _context.Products.FindAsync(id);
-            return productitem;
+            Products model = _context.Products.FirstOrDefault(p => p.Id == id);
+            if(model.Image1 != null)
+            {
+                string path = "Assests/images/" + model.Image1;
+                string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+                var memory = new MemoryStream();
+                using (var stream = new FileStream(filepath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                if(model.Image2 != null)
+                {
+                    path = "Assests/images/" + model.Image2;
+                    filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+                    using (var stream = new FileStream(filepath, FileMode.Open))
+                    {
+                        await stream.CopyToAsync(memory);
+                    }
+                }
+                if (model.Image3 != null)
+                {
+                    path = "Assests/images/" + model.Image3;
+                    filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+                    using (var stream = new FileStream(filepath, FileMode.Open))
+                    {
+                        await stream.CopyToAsync(memory);
+                    }
+                }
+                memory.Position = 1;
+                return File(memory, "image/jpeg");
+            }
+            return NoContent();
         }
+
+
 
         //Post: api/products
         [Authorize]
