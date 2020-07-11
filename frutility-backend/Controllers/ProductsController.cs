@@ -31,6 +31,8 @@ namespace frutility_backend.Controllers
             _context = context;
             _hostingEnvironment = hostingEnvironment;
         }
+
+        //Get All Products
         //api/products
         [HttpGet]
         public async Task<ActionResult<ProductsGetVM>> GetProducts()
@@ -82,55 +84,46 @@ namespace frutility_backend.Controllers
             return Ok(productget);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ProductsGetVM>> GetProductById(int id)
+        //Get Products with a single image
+        [HttpGet("productmin")]
+        public async Task<ActionResult<ProductsGetVM>> GetProductsMin()
         {
-            Products model = _context.Products.FirstOrDefault(p => p.Id == id);
-            List<byte[]> imageBytes = new List<byte[]>();
-            if (model.Image1 != null)
+            var products = await _context.Products.ToListAsync();
+            List<ProductsGetVM> productget = new List<ProductsGetVM>();
+            foreach (var product in products)
             {
-                string path = "Assests/images/" + model.Image1;
-                string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
-                byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-                imageBytes.Add(bytes);
-                if (model.Image2 != null)
+                List<byte[]> imageBytes = new List<byte[]>();
+                if (product.Image1 != null)
                 {
-                    path = "Assests/images/" + model.Image2;
-                    filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
-                    bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+                    string path = "Assests/images/" + product.Image1;
+                    string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+                    byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
                     imageBytes.Add(bytes);
+                    productget.Add(new ProductsGetVM
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        Description = product.Description,
+                        Vendor = product.Vendor,
+                        Price = product.Price,
+                        PriceBeforeDiscount = product.PriceBeforeDiscount,
+                        ImageBytes = imageBytes,
+                        ShippingCharges = product.ShippingCharges,
+                        Availability = product.Availability,
+                        Stock = product.Stock,
+                        PostingDate = product.PostingDate,
+                        UpdationDate = product.UpdationDate,
+                        PackageWeight = product.PackageWeight,
+                        SubCategoryID = product.SubCategoryID
+                    });
                 }
-                if (model.Image3 != null)
-                {
-                    path = "Assests/images/" + model.Image3;
-                    filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
-                    bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-                    imageBytes.Add(bytes);
-                }
-                ProductsGetVM productsGet = new ProductsGetVM
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Description = model.Description,
-                    Vendor = model.Vendor,
-                    Price = model.Price,
-                    PriceBeforeDiscount = model.PriceBeforeDiscount,
-                    ImageBytes = imageBytes,
-                    ShippingCharges = model.ShippingCharges,
-                    Availability = model.Availability,
-                    Stock = model.Stock,
-                    PostingDate = model.PostingDate,
-                    UpdationDate = model.UpdationDate,
-                    PackageWeight = model.PackageWeight,
-                    SubCategoryID = model.SubCategoryID
-                };
-                return productsGet;
             }
-            return NoContent();
+            return Ok(productget);
         }
 
-        [HttpGet("productmin/{id}")]
-        public async Task<ActionResult<ProductsGetVM>> GetProductImageById(int id)
+        //Get single product with single image
+        [HttpGet("productminbyid/{id}")]
+        public async Task<ActionResult<ProductsGetVM>> GetProductMinById(int id)
         {
             Products model = _context.Products.FirstOrDefault(p => p.Id == id);
             List<byte[]> imageBytes = new List<byte[]>();
