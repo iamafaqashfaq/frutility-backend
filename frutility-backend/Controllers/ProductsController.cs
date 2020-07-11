@@ -129,6 +129,39 @@ namespace frutility_backend.Controllers
             return NoContent();
         }
 
+        [HttpGet("productmin/{id}")]
+        public async Task<ActionResult<ProductsGetVM>> GetProductImageById(int id)
+        {
+            Products model = _context.Products.FirstOrDefault(p => p.Id == id);
+            List<byte[]> imageBytes = new List<byte[]>();
+            if (model.Image1 != null)
+            {
+                string path = "Assests/images/" + model.Image1;
+                string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+                byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+                imageBytes.Add(bytes);
+                ProductsGetVM productsGet = new ProductsGetVM
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Vendor = model.Vendor,
+                    Price = model.Price,
+                    PriceBeforeDiscount = model.PriceBeforeDiscount,
+                    ImageBytes = imageBytes,
+                    ShippingCharges = model.ShippingCharges,
+                    Availability = model.Availability,
+                    Stock = model.Stock,
+                    PostingDate = model.PostingDate,
+                    UpdationDate = model.UpdationDate,
+                    PackageWeight = model.PackageWeight,
+                    SubCategoryID = model.SubCategoryID
+                };
+                return productsGet;
+            }
+            return NoContent();
+        }
+
 
 
         //Post: api/products
@@ -146,7 +179,10 @@ namespace frutility_backend.Controllers
                 string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
                 UniqueFileNameimage1 = Guid.NewGuid().ToString() + "_" + model.Image1.FileName;
                 string filepath = Path.Combine(uploadfolder, UniqueFileNameimage1);
-                await model.Image1.CopyToAsync(new FileStream(filepath, FileMode.Create));
+                using(var stream = System.IO.File.Create(filepath))
+                {
+                    await model.Image1.CopyToAsync(stream);
+                }
             }
             string UniqueFileNameimage2 = null;
             if (model.Image2 != null)
@@ -154,7 +190,10 @@ namespace frutility_backend.Controllers
                 string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
                 UniqueFileNameimage2 = Guid.NewGuid().ToString() + "_" + model.Image2.FileName;
                 string filepath = Path.Combine(uploadfolder, UniqueFileNameimage2);
-                await model.Image2.CopyToAsync(new FileStream(filepath, FileMode.Create));
+                using (var stream = System.IO.File.Create(filepath))
+                {
+                    await model.Image2.CopyToAsync(stream);
+                }
             }
             string UniqueFileNameimage3 = null;
             if (model.Image3 != null)
@@ -162,7 +201,10 @@ namespace frutility_backend.Controllers
                 string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
                 UniqueFileNameimage3 = Guid.NewGuid().ToString() + "_" + model.Image3.FileName;
                 string filepath = Path.Combine(uploadfolder, UniqueFileNameimage3);
-                await model.Image3.CopyToAsync(new FileStream(filepath, FileMode.Create));
+                using (var stream = System.IO.File.Create(filepath))
+                {
+                    await model.Image3.CopyToAsync(stream);
+                }
             }
             Products products = new Products
             {
