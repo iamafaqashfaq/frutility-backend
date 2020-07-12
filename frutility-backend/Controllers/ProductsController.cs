@@ -39,7 +39,7 @@ namespace frutility_backend.Controllers
         {
             var products = await _context.Products.ToListAsync();
             List<ProductsGetVM> productget = new List<ProductsGetVM>();
-            foreach(var product in products)
+            foreach (var product in products)
             {
                 List<byte[]> imageBytes = new List<byte[]>();
                 if (product.Image1 != null)
@@ -160,7 +160,7 @@ namespace frutility_backend.Controllers
         //Post: api/products
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Products>> PostProducts([FromForm]ProductsViewModel model)
+        public async Task<ActionResult<Products>> PostProducts([FromForm] ProductsViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -172,7 +172,7 @@ namespace frutility_backend.Controllers
                 string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
                 UniqueFileNameimage1 = Guid.NewGuid().ToString() + "_" + model.Image1.FileName;
                 string filepath = Path.Combine(uploadfolder, UniqueFileNameimage1);
-                using(var stream = System.IO.File.Create(filepath))
+                using (var stream = System.IO.File.Create(filepath))
                 {
                     await model.Image1.CopyToAsync(stream);
                 }
@@ -209,6 +209,90 @@ namespace frutility_backend.Controllers
                 Image1 = UniqueFileNameimage1,
                 Image2 = UniqueFileNameimage2,
                 Image3 = UniqueFileNameimage3,
+                ShippingCharges = model.ShippingCharges,
+                Availability = model.Availability,
+                Stock = model.Stock,
+                PostingDate = DateTime.Now,
+                UpdationDate = DateTime.Now,
+                PackageWeight = model.PackageWeight,
+                SubCategoryID = model.SubCategoryID
+            };
+            _context.Products.Add(products);
+            await _context.SaveChangesAsync();
+            return Ok(products);
+        }
+
+        //Post: api/products
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Products>> PostProduct([FromForm]ProductUpdateVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid Data");
+            }
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == model.Id);
+            string UniqueFileNameimage1 = null;
+            if (model.ImageNo1)
+            {
+                if (model.Image1 != null)
+                {
+                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                    UniqueFileNameimage1 = Guid.NewGuid().ToString() + "_" + model.Image1.FileName;
+                    string filepath = Path.Combine(uploadfolder, UniqueFileNameimage1);
+                    string prevFile = Path.Combine(uploadfolder, product.Image1);
+                    System.IO.File.Delete(prevFile);
+                    using (var stream = System.IO.File.Create(filepath))
+                    {
+                        await model.Image1.CopyToAsync(stream);
+                    }
+                }
+            }
+            string UniqueFileNameimage2 = null;
+            if (model.ImageNo2)
+            {
+                if (model.Image2 != null)
+                {
+                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                    UniqueFileNameimage2 = Guid.NewGuid().ToString() + "_" + model.Image2.FileName;
+                    string filepath = Path.Combine(uploadfolder, UniqueFileNameimage2);
+                    string prevFile = Path.Combine(uploadfolder, product.Image2);
+                    System.IO.File.Delete(prevFile);
+                    using (var stream = System.IO.File.Create(filepath))
+                    {
+                        await model.Image2.CopyToAsync(stream);
+                    }
+                }
+            }
+            
+            string UniqueFileNameimage3 = null;
+            if (model.ImageNo3)
+            {
+                if (model.Image3 != null)
+                {
+                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                    UniqueFileNameimage3 = Guid.NewGuid().ToString() + "_" + model.Image3.FileName;
+                    string filepath = Path.Combine(uploadfolder, UniqueFileNameimage3);
+                    string prevFile = Path.Combine(uploadfolder, product.Image3);
+                    System.IO.File.Delete(prevFile);
+                    using (var stream = System.IO.File.Create(filepath))
+                    {
+                        await model.Image3.CopyToAsync(stream);
+                    }
+                }
+            }
+
+            Products products = new Products
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Description = model.Description,
+                Vendor = model.Vendor,
+                Price = model.Price,
+                PriceBeforeDiscount = model.PriceBeforeDiscount,
+                Image1 = (UniqueFileNameimage1 != null) ? UniqueFileNameimage1 : product.Image1,
+                Image2 = (UniqueFileNameimage2 != null) ? UniqueFileNameimage2 : product.Image2,
+                Image3 = (UniqueFileNameimage3 != null) ? UniqueFileNameimage3 : product.Image3,
                 ShippingCharges = model.ShippingCharges,
                 Availability = model.Availability,
                 Stock = model.Stock,
