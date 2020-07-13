@@ -23,8 +23,6 @@ namespace frutility_backend.Data.ViewModel
         public double ShippingCharges { get; set; }
         public bool Availability { get; set; }
         public int Stock { get; set; }
-        public DateTime PostingDate { get; set; }
-        public DateTime UpdationDate { get; set; }
         public double PackageWeight { get; set; }
         public int SubCategoryID { get; set; }
     }
