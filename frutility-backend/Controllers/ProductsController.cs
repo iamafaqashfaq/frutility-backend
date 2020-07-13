@@ -310,13 +310,32 @@ namespace frutility_backend.Controllers
 
 
         //Delete: api/products/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Products>> DeleteProducts(int id)
         {
             Products products = await _context.Products.FindAsync(id);
-            if(products == null)
+            if (products == null)
             {
                 return BadRequest();
+            }
+            if (products.Image1 != null)
+            {
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string filepath = Path.Combine(uploadfolder, products.Image1);
+                System.IO.File.Delete(filepath);
+            }
+            if (products.Image2 != null)
+            {
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string filepath = Path.Combine(uploadfolder, products.Image2);
+                System.IO.File.Delete(filepath);
+            }
+            if (products.Image3 != null)
+            {
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string filepath = Path.Combine(uploadfolder, products.Image3);
+                System.IO.File.Delete(filepath);
             }
             _context.Products.Remove(products);
             await _context.SaveChangesAsync();
