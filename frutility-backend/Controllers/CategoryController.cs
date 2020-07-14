@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
@@ -69,8 +70,11 @@ namespace frutility_backend.Controllers
             {
                 return BadRequest();
             }
-            categoryrec.UpdationDate = DateTime.Now;
-            _context.Entry(categoryrec).State = EntityState.Modified;
+            var category = await _context.Categories.FindAsync(categoryrec.Id);
+            category.CategoryName = categoryrec.CategoryName;
+            category.Description = categoryrec.Description;
+            category.UpdationDate = DateTime.Now;
+            _context.Entry(category).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok(true);
         }

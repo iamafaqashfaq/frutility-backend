@@ -44,20 +44,20 @@ namespace frutility_backend.Controllers
                 List<byte[]> imageBytes = new List<byte[]>();
                 if (product.Image1 != null)
                 {
-                    string path = "Assests/images/" + product.Image1;
+                    string path = "Assets/images/" + product.Image1;
                     string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
                     byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
                     imageBytes.Add(bytes);
                     if (product.Image2 != null)
                     {
-                        path = "Assests/images/" + product.Image2;
+                        path = "Assets/images/" + product.Image2;
                         filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
                         bytes = await System.IO.File.ReadAllBytesAsync(filepath);
                         imageBytes.Add(bytes);
                     }
                     if (product.Image3 != null)
                     {
-                        path = "Assests/images/" + product.Image3;
+                        path = "Assets/images/" + product.Image3;
                         filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
                         bytes = await System.IO.File.ReadAllBytesAsync(filepath);
                         imageBytes.Add(bytes);
@@ -95,7 +95,7 @@ namespace frutility_backend.Controllers
                 List<byte[]> imageBytes = new List<byte[]>();
                 if (product.Image1 != null)
                 {
-                    string path = "Assests/images/" + product.Image1;
+                    string path = "Assets/images/" + product.Image1;
                     string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
                     byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
                     imageBytes.Add(bytes);
@@ -129,7 +129,7 @@ namespace frutility_backend.Controllers
             List<byte[]> imageBytes = new List<byte[]>();
             if (model.Image1 != null)
             {
-                string path = "Assests/images/" + model.Image1;
+                string path = "Assets/images/" + model.Image1;
                 string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
                 byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
                 imageBytes.Add(bytes);
@@ -169,7 +169,7 @@ namespace frutility_backend.Controllers
             string UniqueFileNameimage1 = null;
             if (model.Image1 != null)
             {
-                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                 UniqueFileNameimage1 = Guid.NewGuid().ToString() + "_" + model.Image1.FileName;
                 string filepath = Path.Combine(uploadfolder, UniqueFileNameimage1);
                 using (var stream = System.IO.File.Create(filepath))
@@ -180,7 +180,7 @@ namespace frutility_backend.Controllers
             string UniqueFileNameimage2 = null;
             if (model.Image2 != null)
             {
-                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                 UniqueFileNameimage2 = Guid.NewGuid().ToString() + "_" + model.Image2.FileName;
                 string filepath = Path.Combine(uploadfolder, UniqueFileNameimage2);
                 using (var stream = System.IO.File.Create(filepath))
@@ -191,7 +191,7 @@ namespace frutility_backend.Controllers
             string UniqueFileNameimage3 = null;
             if (model.Image3 != null)
             {
-                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                 UniqueFileNameimage3 = Guid.NewGuid().ToString() + "_" + model.Image3.FileName;
                 string filepath = Path.Combine(uploadfolder, UniqueFileNameimage3);
                 using (var stream = System.IO.File.Create(filepath))
@@ -213,7 +213,6 @@ namespace frutility_backend.Controllers
                 Availability = model.Availability,
                 Stock = model.Stock,
                 PostingDate = DateTime.Now,
-                UpdationDate = DateTime.Now,
                 PackageWeight = model.PackageWeight,
                 SubCategoryID = model.SubCategoryID
             };
@@ -235,7 +234,7 @@ namespace frutility_backend.Controllers
             {
                 if (model.Image1 != null)
                 {
-                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                     UniqueFileNameimage1 = Guid.NewGuid().ToString() + "_" + model.Image1.FileName;
                     string filepath = Path.Combine(uploadfolder, UniqueFileNameimage1);
                     if (product.Image1 != null)
@@ -254,7 +253,7 @@ namespace frutility_backend.Controllers
             {
                 if (model.Image2 != null)
                 {
-                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                     UniqueFileNameimage2 = Guid.NewGuid().ToString() + "_" + model.Image2.FileName;
                     string filepath = Path.Combine(uploadfolder, UniqueFileNameimage2);
                     if (product.Image2 != null)
@@ -274,7 +273,7 @@ namespace frutility_backend.Controllers
             {
                 if (model.Image3 != null)
                 {
-                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                    string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                     UniqueFileNameimage3 = Guid.NewGuid().ToString() + "_" + model.Image3.FileName;
                     string filepath = Path.Combine(uploadfolder, UniqueFileNameimage3);
                     if(product.Image3 != null)
@@ -288,7 +287,6 @@ namespace frutility_backend.Controllers
                     }
                 }
             }
-            product.Id = model.Id;
             product.Name = model.Name;
             product.Description = model.Description;
             product.Vendor = model.Vendor;
@@ -321,19 +319,19 @@ namespace frutility_backend.Controllers
             }
             if (products.Image1 != null)
             {
-                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                 string filepath = Path.Combine(uploadfolder, products.Image1);
                 System.IO.File.Delete(filepath);
             }
             if (products.Image2 != null)
             {
-                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                 string filepath = Path.Combine(uploadfolder, products.Image2);
                 System.IO.File.Delete(filepath);
             }
             if (products.Image3 != null)
             {
-                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assests/images");
+                string uploadfolder = Path.Combine(_hostingEnvironment.ContentRootPath, "Assets/images");
                 string filepath = Path.Combine(uploadfolder, products.Image3);
                 System.IO.File.Delete(filepath);
             }

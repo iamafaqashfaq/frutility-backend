@@ -75,8 +75,11 @@ namespace frutility_backend.Controllers
             {
                 return BadRequest("Invalid Data");
             }
-            subCategoryrec.UpdationDate = DateTime.Now;
-            _context.Entry(subCategoryrec).State = EntityState.Modified;
+            var subcategory = await _context.SubCategories.FindAsync(subCategoryrec.ID);
+            subcategory.SubcategoryName = subCategoryrec.SubcategoryName;
+            subcategory.CategoryID = subCategoryrec.CategoryID;
+            subcategory.UpdationDate = DateTime.Now;
+            _context.Entry(subcategory).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return Ok(true);
         }
