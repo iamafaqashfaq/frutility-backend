@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
 using SQLitePCL;
+using Microsoft.Extensions.Primitives;
 
 namespace frutility_backend.Controllers
 {
@@ -44,12 +45,39 @@ namespace frutility_backend.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("UsersList")]
+        [Route("customerslist")]
         public async Task<ActionResult<ApplicationUser>> GetUsersList()
         {
-            var users = await _userManager.GetUsersInRoleAsync("Admin");
-            return Ok(users);
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
+                string strtoken = String.Concat(token);
+                strtoken = strtoken.Replace("Bearer ", "");
+                var result = gettoken(strtoken);
+                if (result.Result.Contains("Admin"))
+                {
+                    var user = await _userManager.GetUsersInRoleAsync("User");
+                    return Ok(user);
+                }
+            }
+            return NoContent();
         }
+        //Get userroles through recieved token
+        public async Task<IList<string>> gettoken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var tokens = handler.ReadToken(token) as JwtSecurityToken;
+            var decoded = tokens.Claims.FirstOrDefault(t => t.Type == "unique_name");
+            var user = await _userManager.FindByIdAsync(decoded.Value);
+            var result = _userManager.GetRolesAsync(user);
+            if (result != null)
+            {
+                return result.Result;
+            }
+            return null;
+        }
+
+
         [AllowAnonymous]
         [Route("userregister")]
         [HttpPost]
@@ -96,20 +124,6 @@ namespace frutility_backend.Controllers
                 }
             }
             return Ok(false);
-        }
-
-        [HttpGet]
-        [Route("gettoken")]
-        public ActionResult gettoken()
-        {
-            if (Request.Headers.ContainsKey("Authorization"))
-            {
-                string[] token =  Request.Headers.GetCommaSeparatedValues("Authorization");
-                string stringtoken = Convert.ToString(token);
-                stringtoken = stringtoken.Replace("Bearer ", "");
-                return Ok(stringtoken);
-            }
-            return NoContent();
         }
 
 
