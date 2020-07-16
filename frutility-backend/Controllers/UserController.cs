@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using SQLitePCL;
 
 namespace frutility_backend.Controllers
 {
@@ -27,19 +28,28 @@ namespace frutility_backend.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly DataContext _context;
         private readonly IConfiguration _config;
 
         public UserController(UserManager<ApplicationUser> usermanager,
-            SignInManager<ApplicationUser> signInManager, IConfiguration config, 
-            RoleManager<IdentityRole> roleManager)
+            SignInManager<ApplicationUser> signInManager, IConfiguration config,
+            RoleManager<IdentityRole> roleManager, DataContext context)
         {
             _userManager = usermanager;
             _signInManager = signInManager;
             _config = config;
             _roleManager = roleManager;
+            _context = context;
         }
 
-
+        [Authorize]
+        [HttpGet]
+        [Route("UsersList")]
+        public async Task<ActionResult<ApplicationUser>> GetUsersList()
+        {
+            var users = await _userManager.GetUsersInRoleAsync("Admin");
+            return Ok(users);
+        }
         [AllowAnonymous]
         [Route("userregister")]
         [HttpPost]
@@ -86,6 +96,20 @@ namespace frutility_backend.Controllers
                 }
             }
             return Ok(false);
+        }
+
+        [HttpGet]
+        [Route("gettoken")]
+        public ActionResult gettoken()
+        {
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                string[] token =  Request.Headers.GetCommaSeparatedValues("Authorization");
+                string stringtoken = Convert.ToString(token);
+                stringtoken = stringtoken.Replace("Bearer ", "");
+                return Ok(stringtoken);
+            }
+            return NoContent();
         }
 
 
