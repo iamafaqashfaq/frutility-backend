@@ -81,11 +81,23 @@ namespace frutility_backend.Controllers
         [AllowAnonymous]
         [Route("userregister")]
         [HttpPost]
-        public async Task<IActionResult> RegisterUser(ApplicationUserVM model)
+        public async Task<IActionResult> RegisterUser(UserSignupVM model)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+                var user = new ApplicationUser { 
+                    UserName = model.UserName, 
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    ShippingAddress = model.ShippingAddress,
+                    ShippingState = model.ShippingState,
+                    ShippingCity = model.ShippingCity,
+                    BillingAddress = model.BillingAddress,
+                    BillingState = model.BillingState,
+                    BillingCity = model.BillingCity,
+                    PhoneNumber = model.Phone
+                };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 var userRole = new IdentityRole("User");
                 var roleresult = await _roleManager.RoleExistsAsync(userRole.Name);
@@ -98,7 +110,11 @@ namespace frutility_backend.Controllers
                     await _userManager.AddToRoleAsync(user, userRole.Name);
                     await _signInManager.SignInAsync(user, false);
                     var userId = await _userManager.FindByNameAsync(user.UserName);
-                    var token = GenerateToken(userId);
+                    Token token = new Token
+                    {
+                        entoken = GenerateToken(userId),
+                        UserName = userId.UserName
+                    };
                     return Ok(token);
                 }
             }
