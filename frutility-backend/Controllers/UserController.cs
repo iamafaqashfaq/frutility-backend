@@ -85,20 +85,20 @@ namespace frutility_backend.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { 
-                    UserName = model.UserName, 
-                    Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    ShippingAddress = model.ShippingAddress,
-                    ShippingState = model.ShippingState,
-                    ShippingCity = model.ShippingCity,
-                    BillingAddress = model.BillingAddress,
-                    BillingState = model.BillingState,
-                    BillingCity = model.BillingCity,
-                    PhoneNumber = model.Phone
+                var user = new ApplicationUser {
+                    UserName = model.username,
+                    Email = model.email,
+                    FirstName = model.fname,
+                    LastName = model.lname,
+                    ShippingAddress = model.sAddress,
+                    ShippingState = model.sState,
+                    ShippingCity = model.sCity,
+                    BillingAddress = model.bAddress,
+                    BillingState = model.bState,
+                    BillingCity = model.bCity,
+                    PhoneNumber = model.phone
                 };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var result = await _userManager.CreateAsync(user, model.password);
                 var userRole = new IdentityRole("User");
                 var roleresult = await _roleManager.RoleExistsAsync(userRole.Name);
                 if (!roleresult)
@@ -135,7 +135,11 @@ namespace frutility_backend.Controllers
                 if (result.Succeeded)
                 {
                     ApplicationUser user = await _userManager.FindByNameAsync(model.UserName);
-                    var token = GenerateToken(user);
+                    Token token = new Token
+                    {
+                        entoken = GenerateToken(user),
+                        UserName = user.UserName
+                    };
                     return Ok(token);
                 }
             }

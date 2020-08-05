@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -108,7 +109,7 @@ namespace frutility_backend.Controllers
             if (result.Result.Contains("Admin"))
             {
                 var order = await (from s in _context.Orders
-                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "pending")
+                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "Pending")
                                    select new OrdersDetailsVM
                                    {
                                        Id = s.Id,
@@ -168,16 +169,54 @@ namespace frutility_backend.Controllers
         }
 
         //POST: api/orders
+        //[HttpPost]
+        //public async Task<ActionResult<Order>> PostOrder(Order order)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest("Invalid Data");
+        //    _context.Orders.Add(order);
+        //    await _context.SaveChangesAsync();
+        //    return Ok();
+        //}
+
         [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
+        public async Task<ActionResult> PostOrder(OrderPostVM orderPost)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest("Invalid Data");
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-            return Ok();
+            }
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
+                string strtoken = String.Concat(token);
+                strtoken = strtoken.Replace("Bearer ", "");
+                var result = gettoken(strtoken);
+                string userId = result.Result;
+                Order order = new Order
+                {
+                    UserId = Convert.ToString(userId),
+                    ProductId = orderPost.ProductId,
+                    Quantity = orderPost.Quantity,
+                    OrderDate = DateTime.Now,
+                    PaymentMethod = "COD",
+                    OrderStatus = "Pending"
+                };
+                _context.Add(order);
+                await _context.SaveChangesAsync();
+                return Ok(order);
+            }
+            return Ok(false);
         }
-
+        //Get userroles through recieved token
+        public async Task<string> gettoken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var tokens = handler.ReadToken(token) as JwtSecurityToken;
+            var decoded = tokens.Claims.FirstOrDefault(t => t.Type == "unique_name");
+            var user = await _userManager.FindByIdAsync(decoded.Value);
+            return user.Id;
+        }
         //PUT: api/orders/{id}
         [HttpPut("{id}")]
         public async Task<ActionResult<Order>> UpdateOrder(int id, Order order)
