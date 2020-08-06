@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using frutility_backend.Data.Model;
 using frutility_backend.Data.ViewModel;
 using frutility_backend.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,13 +24,17 @@ namespace frutility_backend.Controllers
     {
         private readonly DataContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public OrderController(DataContext context, UserManager<ApplicationUser> userManager)
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public OrderController(DataContext context, UserManager<ApplicationUser> userManager, 
+            IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _userManager = userManager;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         //Get: api/orders
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
@@ -41,7 +47,7 @@ namespace frutility_backend.Controllers
         public ActionResult<int> GetTodayCount()
         {
             int order = _context.Orders.Where(o => o.OrderDate.Date ==
-            DateTime.Now.Date && o.OrderStatus == "Pending").Count();
+            DateTime.Now.Date && o.OrderStatus == "PENDING").Count();
             return order;
         }
 
@@ -50,8 +56,8 @@ namespace frutility_backend.Controllers
         [HttpGet]
         public ActionResult<int> GetPendingCount()
         {
-            int order = _context.Orders.Where(o => o.OrderDate.Date !=
-            DateTime.Now.Date || o.OrderStatus == "Dispatched").Count();
+            int order = _context.Orders.Where(o => (o.OrderDate.Date !=
+            DateTime.Now.Date || o.OrderStatus == "DISPATCHED") || o.OrderStatus == "PENDING").Count();
             return order;
         }
 
@@ -60,7 +66,7 @@ namespace frutility_backend.Controllers
         [HttpGet]
         public ActionResult<int> GetDeliveredCount()
         {
-            int order = _context.Orders.Where(o => o.OrderStatus == "Delivered").Count();
+            int order = _context.Orders.Where(o => o.OrderStatus == "DELIVERED").Count();
             return order;
         }
 
@@ -109,7 +115,7 @@ namespace frutility_backend.Controllers
             if (result.Result.Contains("Admin"))
             {
                 var order = await (from s in _context.Orders
-                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "Pending")
+                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "PENDING")
                                    select new OrdersDetailsVM
                                    {
                                        Id = s.Id,
@@ -141,7 +147,7 @@ namespace frutility_backend.Controllers
             if (result.Result.Contains("Admin"))
             {
                 var order = await (from s in _context.Orders
-                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "Delivered")
+                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "DELIVERED")
                                    select new OrdersDetailsVM
                                    {
                                        Id = s.Id,
@@ -161,6 +167,7 @@ namespace frutility_backend.Controllers
             return Ok(decoded);
         }
         //Get: api/orders/{id}
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByUserID(string id)
         {
@@ -168,17 +175,72 @@ namespace frutility_backend.Controllers
             return orders;
         }
 
-        //POST: api/orders
-        //[HttpPost]
-        //public async Task<ActionResult<Order>> PostOrder(Order order)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest("Invalid Data");
-        //    _context.Orders.Add(order);
-        //    await _context.SaveChangesAsync();
-        //    return Ok();
-        //}
+        //Get: api/orders/userordercount
+        [Authorize]
+        [Route("userordercount")]
+        [HttpGet]
+        public async Task<ActionResult> GetUserOrderCount()
+        {
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
+                string strtoken = String.Concat(token);
+                strtoken = strtoken.Replace("Bearer ", "");
+                var result = gettoken(strtoken);
+                var order = await _context.Orders.Where(u => u.UserId == result.Result 
+                && u.OrderStatus == "NOTCONFIRMED").CountAsync();
+                return Ok(order);
+            }
+            return Ok(false);
+        }
 
+        //Get: api/orders/shoppingcart
+        [Authorize]
+        [Route("shoppingcart")]
+        [HttpGet]
+        public async Task<ActionResult> GetShoppingCartItems()
+        {
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
+                string strtoken = String.Concat(token);
+                strtoken = strtoken.Replace("Bearer ", "");
+                var result = gettoken(strtoken);
+                var orderdetail = await _context.Orders
+                    .Include(p => p.Products).Where(u=>u.UserId == result.Result && 
+                    u.OrderStatus == "NOTCONFIRMED").ToListAsync();
+                List<OrderCartVM> orders = new List<OrderCartVM>();
+                foreach(var order in orderdetail)
+                {
+                    List<byte[]> imageBytes = new List<byte[]>();
+                    if (order.Products.Image1 != null)
+                    {
+                        string path = "Assets/images/" + order.Products.Image1;
+                        string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+                        byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+                        imageBytes.Add(bytes);
+                        orders.Add(new OrderCartVM
+                        {
+                            Id = order.Id,
+                            UserId = order.UserId,
+                            ProductId = order.ProductId,
+                            Quantity = order.Quantity,
+                            OrderDate = order.OrderDate,
+                            PaymentMethod = order.PaymentMethod,
+                            OrderStatus = order.OrderStatus,
+                            ApplicationUser = order.ApplicationUser,
+                            Products = order.Products,
+                            ImageBytes = imageBytes
+                        });
+                    }
+                }
+                return Ok(orders);
+            }
+            return Ok(false);
+        }
+
+        //POST: api/orders
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> PostOrder(OrderPostVM orderPost)
         {
@@ -200,7 +262,7 @@ namespace frutility_backend.Controllers
                     Quantity = orderPost.Quantity,
                     OrderDate = DateTime.Now,
                     PaymentMethod = "COD",
-                    OrderStatus = "Pending"
+                    OrderStatus = "NOTCONFIRMED"
                 };
                 _context.Add(order);
                 await _context.SaveChangesAsync();
@@ -208,6 +270,7 @@ namespace frutility_backend.Controllers
             }
             return Ok(false);
         }
+
         //Get userroles through recieved token
         public async Task<string> gettoken(string token)
         {
@@ -217,18 +280,27 @@ namespace frutility_backend.Controllers
             var user = await _userManager.FindByIdAsync(decoded.Value);
             return user.Id;
         }
-        //PUT: api/orders/{id}
-        [HttpPut("{id}")]
-        public async Task<ActionResult<Order>> UpdateOrder(int id, Order order)
+        //PUT: api/orders/
+        [Authorize]
+        [HttpPut]
+        public async Task<ActionResult<Order>> UpdateOrder()
         {
-            if (id != order.Id)
-                return BadRequest("Invalid Data");
-            _context.Entry(order).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
+                string strtoken = String.Concat(token);
+                strtoken = strtoken.Replace("Bearer ", "");
+                var result = gettoken(strtoken);
+                string userId = result.Result;
+                _context.Orders.Where(u => u.UserId == userId).ToList().ForEach(o => o.OrderStatus = "PENDING");
+                await _context.SaveChangesAsync();
+                return Ok(true);
+            }
             return NoContent();
         }
 
-        //Delete: api/delete/{id}
+        //Delete: api/orders/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Order>> DeleteOrder(int id)
         {
@@ -239,7 +311,7 @@ namespace frutility_backend.Controllers
             }
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
-            return order;
+            return Ok(true);
         }
     }
 }
