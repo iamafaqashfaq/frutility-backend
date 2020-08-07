@@ -20,6 +20,7 @@ namespace frutility_backend.Data.Model
         public DateTime OrderDate { get; set; }
         public string PaymentMethod { get; set; }
         public string OrderStatus { get; set; }
+        public string Remarks { get; set; }
         public virtual Products Products { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
     }

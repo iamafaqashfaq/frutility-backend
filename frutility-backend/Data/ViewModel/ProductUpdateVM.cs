@@ -18,8 +18,6 @@ namespace frutility_backend.Data.ViewModel
         public IFormFile Image2 { get; set; }
         public IFormFile Image3 { get; set; }
         public bool ImageNo1 { get; set; }
-        public bool ImageNo2 { get; set; }
-        public bool ImageNo3 { get; set; }
         public double ShippingCharges { get; set; }
         public bool Availability { get; set; }
         public int Stock { get; set; }

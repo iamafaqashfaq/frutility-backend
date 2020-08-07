@@ -17,8 +17,6 @@ namespace frutility_backend.Data.Model
         public double Price { get; set; }
         public double? PriceBeforeDiscount { get; set; }
         public string Image1 { get; set; }
-        public string Image2 { get; set; }
-        public string Image3 { get; set; }
         public double ShippingCharges { get; set; }
         public bool Availability { get; set; }
         public int Stock { get; set; }

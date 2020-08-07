@@ -18,5 +18,6 @@ namespace frutility_backend.Data.ViewModel
         public DateTime OrderDate { get; set; }
         public string PaymentMethod { get; set; }
         public string OrderStatus { get; set; }
+        public string Remarks { get; set; }
     }
 }

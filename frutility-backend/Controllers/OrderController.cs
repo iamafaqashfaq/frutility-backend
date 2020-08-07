@@ -25,7 +25,7 @@ namespace frutility_backend.Controllers
         private readonly DataContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        public OrderController(DataContext context, UserManager<ApplicationUser> userManager, 
+        public OrderController(DataContext context, UserManager<ApplicationUser> userManager,
             IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
@@ -41,6 +41,7 @@ namespace frutility_backend.Controllers
             return await _context.Orders.ToListAsync();
         }
 
+        //Get DateTime Now Order Count
         [Authorize]
         [Route("todayorderscount")]
         [HttpGet]
@@ -51,16 +52,18 @@ namespace frutility_backend.Controllers
             return order;
         }
 
+        //Get Pending Orders Count Other Than DateTime Now
         [Authorize]
         [Route("pendingorderscount")]
         [HttpGet]
         public ActionResult<int> GetPendingCount()
         {
-            int order = _context.Orders.Where(o => (o.OrderDate.Date !=
-            DateTime.Now.Date || o.OrderStatus == "DISPATCHED") || o.OrderStatus == "PENDING").Count();
+            int order = _context.Orders.Where(o => o.OrderDate.Date !=
+            DateTime.Now.Date && (o.OrderStatus == "DISPATCHED" || o.OrderStatus == "PENDING")).Count();
             return order;
         }
 
+        //Get Delivered Orders Count
         [Authorize]
         [Route("deliveredorderscount")]
         [HttpGet]
@@ -70,6 +73,7 @@ namespace frutility_backend.Controllers
             return order;
         }
 
+        //Get DateTime Now Orders List
         [Authorize]
         [Route("todayorders")]
         [HttpPost]
@@ -82,27 +86,31 @@ namespace frutility_backend.Controllers
             if (result.Result.Contains("Admin"))
             {
                 var order = await (from s in _context.Orders
-                                   where s.OrderDate.Date == DateTime.Now.Date
+                                   where (s.OrderDate.Date == DateTime.Now.Date &&
+                                   s.OrderStatus == "PENDING")
                                    select new OrdersDetailsVM
                                    {
                                        Id = s.Id,
                                        Name = s.ApplicationUser.UserName,
                                        Email = s.ApplicationUser.Email,
                                        Phone = s.ApplicationUser.PhoneNumber,
-                                       Address = s.ApplicationUser.ShippingAddress,
+                                       Address = s.ApplicationUser.ShippingAddress + ", "
+                                       + s.ApplicationUser.ShippingCity + ", " +
+                                       s.ApplicationUser.ShippingState,
                                        Product = s.Products.Name,
                                        Quantity = s.Quantity,
                                        Amount = s.Products.Price * s.Quantity,
                                        OrderDate = s.OrderDate,
                                        PaymentMethod = s.PaymentMethod,
-                                       OrderStatus = s.OrderStatus
+                                       OrderStatus = s.OrderStatus,
+                                       Remarks = s.Remarks
                                    }).ToListAsync();
                 return Ok(order);
             }
             return Ok(decoded);
         }
 
-
+        //Get Pending Orders List
         [Authorize]
         [Route("pendingorders")]
         [HttpPost]
@@ -115,26 +123,31 @@ namespace frutility_backend.Controllers
             if (result.Result.Contains("Admin"))
             {
                 var order = await (from s in _context.Orders
-                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "PENDING")
+                                   where (s.OrderDate.Date != DateTime.Now.Date &&
+                                   (s.OrderStatus == "PENDING" || s.OrderStatus == "DISPATCHED"))
                                    select new OrdersDetailsVM
                                    {
                                        Id = s.Id,
                                        Name = s.ApplicationUser.UserName,
                                        Email = s.ApplicationUser.Email,
                                        Phone = s.ApplicationUser.PhoneNumber,
-                                       Address = s.ApplicationUser.ShippingAddress,
+                                       Address = s.ApplicationUser.ShippingAddress + ", "
+                                       + s.ApplicationUser.ShippingCity + ", " +
+                                       s.ApplicationUser.ShippingState,
                                        Product = s.Products.Name,
                                        Quantity = s.Quantity,
                                        Amount = s.Products.Price * s.Quantity,
                                        OrderDate = s.OrderDate,
                                        PaymentMethod = s.PaymentMethod,
-                                       OrderStatus = s.OrderStatus
+                                       OrderStatus = s.OrderStatus,
+                                       Remarks = s.Remarks
                                    }).ToListAsync();
                 return Ok(order);
             }
             return Ok(decoded);
         }
 
+        //Get Delivered Orders List
         [Authorize]
         [Route("deliveredorders")]
         [HttpPost]
@@ -147,25 +160,45 @@ namespace frutility_backend.Controllers
             if (result.Result.Contains("Admin"))
             {
                 var order = await (from s in _context.Orders
-                                   where (s.OrderDate.Date != DateTime.Now.Date && s.OrderStatus == "DELIVERED")
+                                   where (s.OrderStatus == "DELIVERED")
                                    select new OrdersDetailsVM
                                    {
                                        Id = s.Id,
                                        Name = s.ApplicationUser.UserName,
                                        Email = s.ApplicationUser.Email,
                                        Phone = s.ApplicationUser.PhoneNumber,
-                                       Address = s.ApplicationUser.ShippingAddress,
+                                       Address = s.ApplicationUser.ShippingAddress + ", "
+                                       + s.ApplicationUser.ShippingCity + ", " +
+                                       s.ApplicationUser.ShippingState,
                                        Product = s.Products.Name,
                                        Quantity = s.Quantity,
                                        Amount = s.Products.Price * s.Quantity,
                                        OrderDate = s.OrderDate,
                                        PaymentMethod = s.PaymentMethod,
+                                       Remarks = s.Remarks,
                                        OrderStatus = s.OrderStatus
                                    }).ToListAsync();
                 return Ok(order);
             }
             return Ok(decoded);
         }
+        //Change Order Status Flag
+        [Authorize]
+        [Route("orderstatus")]
+        [HttpPut]
+        public async Task<ActionResult> UpdateOrderStatus(OrderStatusVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid Data");
+            }
+            Order order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == model.Id);
+            order.OrderStatus = model.OrderStatus;
+            order.Remarks = model.Remarks;
+            await _context.SaveChangesAsync();
+            return Ok(true);
+        }
+
         //Get: api/orders/{id}
         [Authorize]
         [HttpGet("{id}")]
