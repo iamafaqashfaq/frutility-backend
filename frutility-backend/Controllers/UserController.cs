@@ -146,6 +146,35 @@ namespace frutility_backend.Controllers
             }
             return Ok(false);
         }
+        [Authorize]
+        [Route("changeaddress")]
+        [HttpPut]
+        public async Task<ActionResult> ChangeAddress(ChangeAddressVM model)
+        {
+            var user = await _userManager.FindByIdAsync(User.Identity.Name);
+            if(!string.IsNullOrEmpty(model.ShippingAddress) 
+                && !string.IsNullOrEmpty(model.ShippingState)
+                && !string.IsNullOrEmpty(model.ShippingCity))
+            {
+                user.ShippingAddress = model.ShippingAddress;
+                user.ShippingState = model.ShippingState;
+                user.ShippingCity = model.ShippingCity;
+            }
+            if (!string.IsNullOrEmpty(model.BillingAddress)
+                && !string.IsNullOrEmpty(model.BillingState)
+                && !string.IsNullOrEmpty(model.BillingCity))
+            {
+                user.BillingAddress = model.BillingAddress;
+                user.BillingState = model.BillingState;
+                user.BillingCity = model.BillingCity;
+            }
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok(true);
+            }
+            return Ok(false);
+        }
 
 
         [AllowAnonymous]
