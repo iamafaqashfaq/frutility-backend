@@ -87,7 +87,7 @@ namespace frutility_backend.Controllers
             {
                 var order = await (from s in _context.Orders
                                    where (s.OrderDate.Date == DateTime.Now.Date &&
-                                   s.OrderStatus == "PENDING")
+                                   (s.OrderStatus == "PENDING" || s.OrderStatus == "DISPATCHED"))
                                    select new OrdersDetailsVM
                                    {
                                        Id = s.Id,
