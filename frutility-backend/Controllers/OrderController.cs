@@ -297,7 +297,13 @@ namespace frutility_backend.Controllers
                     PaymentMethod = "COD",
                     OrderStatus = "NOTCONFIRMED"
                 };
-                _context.Add(order);
+                await _context.AddAsync(order);
+                Products product = await _context.Products.FirstOrDefaultAsync(p => p.Id == order.ProductId);
+                product.Stock = product.Stock - order.Quantity;
+                if (product.Stock == 0)
+                {
+                    product.Availability = false;
+                }
                 await _context.SaveChangesAsync();
                 return Ok(order);
             }
