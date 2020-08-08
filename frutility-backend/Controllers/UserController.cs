@@ -53,28 +53,15 @@ namespace frutility_backend.Controllers
                 string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
                 string strtoken = String.Concat(token);
                 strtoken = strtoken.Replace("Bearer ", "");
-                var result = gettoken(strtoken);
-                if (result.Result.Contains("Admin"))
+                var user = await _userManager.FindByIdAsync(User.Identity.Name);
+                var result = await _userManager.GetRolesAsync(user);
+                if (result.Contains("Admin"))
                 {
-                    var user = await _userManager.GetUsersInRoleAsync("User");
-                    return Ok(user);
+                    var users = await _userManager.GetUsersInRoleAsync("User");
+                    return Ok(users);
                 }
             }
             return NoContent();
-        }
-        //Get userroles through recieved token
-        public async Task<IList<string>> gettoken(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var tokens = handler.ReadToken(token) as JwtSecurityToken;
-            var decoded = tokens.Claims.FirstOrDefault(t => t.Type == "unique_name");
-            var user = await _userManager.FindByIdAsync(decoded.Value);
-            var result = _userManager.GetRolesAsync(user);
-            if (result != null)
-            {
-                return result.Result;
-            }
-            return null;
         }
 
 
@@ -146,6 +133,20 @@ namespace frutility_backend.Controllers
             return Ok(false);
         }
 
+        [Authorize]
+        [Route("changepassword")]
+        [HttpPut]
+        public async Task<ActionResult> ChangePassword(ChangePasswordVM model)
+        {
+            var user = await _userManager.FindByIdAsync(User.Identity.Name);
+            var result = await _userManager.ChangePasswordAsync(user, model.Oldpassword, model.Newpassword);
+            if (result.Succeeded)
+            {
+                return Ok(true);
+            }
+            return Ok(false);
+        }
+
 
         [AllowAnonymous]
         [Route("adminlogin")]
@@ -175,6 +176,15 @@ namespace frutility_backend.Controllers
             return Ok(false);
         }
 
+        //Get User Data to show user Account
+        [Authorize]
+        [Route("getmydata")]
+        [HttpGet]
+        public async Task<ActionResult> GetMyData()
+        {
+            var user = await _userManager.FindByIdAsync(User.Identity.Name);
+            return Ok(user);
+        }
 
 
         public string GenerateToken(ApplicationUser user)
