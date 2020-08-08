@@ -19,5 +19,6 @@ namespace frutility_backend.Data
         public DbSet<Products> Products { get; set; }
         public DbSet<ProductReviews> ProductReviews { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
     }
 }
