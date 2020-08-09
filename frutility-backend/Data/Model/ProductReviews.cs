@@ -13,7 +13,6 @@ namespace frutility_backend.Data.Model
         public int ProductId { get; set; }
         public int Quality { get; set; }
         public string Name { get; set; }
-        public string Summary { get; set; }
         public string Review { get; set; }
         public DateTime ReviewDate { get; set; }
         public virtual Products Products { get; set; }

@@ -281,31 +281,31 @@ namespace frutility_backend.Controllers
             {
                 return BadRequest("Invalid Data");
             }
-            if (Request.Headers.ContainsKey("Authorization"))
+            if (User.Identity.IsAuthenticated)
             {
-                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
-                string strtoken = String.Concat(token);
-                strtoken = strtoken.Replace("Bearer ", "");
-                var result = gettoken(strtoken);
-                string userId = result.Result;
-                Order order = new Order
-                {
-                    UserId = Convert.ToString(userId),
-                    ProductId = orderPost.ProductId,
-                    Quantity = orderPost.Quantity,
-                    OrderDate = DateTime.Now,
-                    PaymentMethod = "COD",
-                    OrderStatus = "NOTCONFIRMED"
-                };
-                await _context.AddAsync(order);
-                Products product = await _context.Products.FirstOrDefaultAsync(p => p.Id == order.ProductId);
-                product.Stock = product.Stock - order.Quantity;
-                if (product.Stock == 0)
+                var user = await _userManager.FindByIdAsync(User.Identity.Name);
+                Products product = await _context.Products.
+                    FirstOrDefaultAsync(p => p.Id == orderPost.ProductId);
+                if (product.Stock <= 0)
                 {
                     product.Availability = false;
                 }
-                await _context.SaveChangesAsync();
-                return Ok(order);
+                else
+                {
+                    product.Stock = product.Stock - orderPost.Quantity;
+                    Order order = new Order
+                    {
+                        UserId = user.Id,
+                        ProductId = orderPost.ProductId,
+                        Quantity = orderPost.Quantity,
+                        OrderDate = DateTime.Now,
+                        PaymentMethod = "COD",
+                        OrderStatus = "NOTCONFIRMED"
+                    };
+                    await _context.AddAsync(order);
+                    await _context.SaveChangesAsync();
+                    return Ok(order);
+                }
             }
             return Ok(false);
         }
@@ -348,6 +348,8 @@ namespace frutility_backend.Controllers
             {
                 return NotFound();
             }
+            Products products = await _context.Products.FirstOrDefaultAsync(p => p.Id == order.ProductId);
+            products.Stock = products.Stock + order.Quantity;
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
             return Ok(true);
