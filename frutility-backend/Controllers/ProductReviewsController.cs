@@ -47,11 +47,16 @@ namespace frutility_backend.Controllers
         [HttpGet("starrating/{id}")]
         public async Task<ActionResult> GetStarRatingById(int id)
         {
-            var star = await _context.ProductReviews.Where(o => o.Quality == 1).CountAsync();
-            var star1 = await _context.ProductReviews.Where(o => o.Quality == 2).CountAsync();
-            var star2 = await _context.ProductReviews.Where(o => o.Quality == 3).CountAsync();
-            var star3 = await _context.ProductReviews.Where(o => o.Quality == 4).CountAsync();
-            var star4 = await _context.ProductReviews.Where(o => o.Quality == 5).CountAsync();
+            var star = await _context.ProductReviews.Where(o => o.Quality == 1 && o.ProductId == id)
+                .CountAsync();
+            var star1 = await _context.ProductReviews.Where(o => o.Quality == 2 && o.ProductId == id)
+                .CountAsync();
+            var star2 = await _context.ProductReviews.Where(o => o.Quality == 3 && o.ProductId == id)
+                .CountAsync();
+            var star3 = await _context.ProductReviews.Where(o => o.Quality == 4 && o.ProductId == id)
+                .CountAsync();
+            var star4 = await _context.ProductReviews.Where(o => o.Quality == 5 && o.ProductId == id)
+                .CountAsync();
             GetStarRatingVM rating = new GetStarRatingVM
             {
                 One = star,
