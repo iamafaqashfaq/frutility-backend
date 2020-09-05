@@ -39,9 +39,9 @@ namespace frutility_backend
             {
                 c.AddPolicy("AllowOrigin", options =>
                 options.AllowAnyHeader()
-                .AllowAnyMethod().
-                AllowCredentials()
-                .WithOrigins("http://localhost:3000"));
+                .AllowAnyMethod().AllowAnyOrigin());
+                //AllowCredentials()
+                //.WithOrigins("http://localhost:3000"));
             });
 
             //Adding DATABASE
