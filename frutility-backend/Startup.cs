@@ -39,15 +39,15 @@ namespace frutility_backend
             {
                 c.AddPolicy("AllowOrigin", options =>
                 options.AllowAnyHeader()
-                .AllowAnyMethod().AllowAnyOrigin());
-                //AllowCredentials()
-                //.WithOrigins("http://localhost:3000"));
+                .AllowAnyMethod()//.AllowAnyOrigin());
+                .AllowCredentials()
+                .WithOrigins("http://localhost:3000"));
             });
 
             //Adding DATABASE
             string connection = Configuration.GetConnectionString("Default");
             services.AddControllers();
-            services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<DataContext>(options => options.UseSqlite(connection));
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
              {
                  options.Password.RequireDigit = false;

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace frutility_backend.Migrations
 {
-    public partial class ChangesIsNaming : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -40,14 +40,14 @@ namespace frutility_backend.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
                     ShippingAddress = table.Column<string>(nullable: true),
                     ShippingState = table.Column<string>(nullable: true),
                     ShippingCity = table.Column<string>(nullable: true),
-                    ShippingPincode = table.Column<int>(nullable: false),
                     BillingAddress = table.Column<string>(nullable: true),
                     BillingState = table.Column<string>(nullable: true),
                     BillingCity = table.Column<string>(nullable: true),
-                    BillingPincode = table.Column<int>(nullable: false),
                     RegDate = table.Column<DateTime>(nullable: false),
                     UpdationDate = table.Column<DateTime>(nullable: false)
                 },
@@ -61,7 +61,7 @@ namespace frutility_backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     CategoryName = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     CreationDate = table.Column<DateTime>(nullable: false),
@@ -77,7 +77,7 @@ namespace frutility_backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     RoleId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -98,7 +98,7 @@ namespace frutility_backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -183,7 +183,7 @@ namespace frutility_backend.Migrations
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     SubcategoryName = table.Column<string>(nullable: true),
                     CategoryID = table.Column<int>(nullable: false),
                     CreationDate = table.Column<DateTime>(nullable: false),
@@ -197,7 +197,7 @@ namespace frutility_backend.Migrations
                         column: x => x.CategoryID,
                         principalTable: "Categories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -205,39 +205,30 @@ namespace frutility_backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Vendor = table.Column<string>(nullable: true),
                     Price = table.Column<double>(nullable: false),
                     PriceBeforeDiscount = table.Column<double>(nullable: true),
                     Image1 = table.Column<string>(nullable: true),
-                    Image2 = table.Column<string>(nullable: true),
-                    Image3 = table.Column<string>(nullable: true),
                     ShippingCharges = table.Column<double>(nullable: false),
                     Availability = table.Column<bool>(nullable: false),
                     Stock = table.Column<int>(nullable: false),
                     PostingDate = table.Column<DateTime>(nullable: false),
-                    UpdataionDate = table.Column<DateTime>(nullable: false),
+                    UpdationDate = table.Column<DateTime>(nullable: false),
                     PackageWeight = table.Column<double>(nullable: false),
-                    SubCategoryID = table.Column<int>(nullable: false),
-                    CategoryID = table.Column<int>(nullable: false)
+                    SubCategoryID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_Categories_CategoryID",
-                        column: x => x.CategoryID,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Products_SubCategories_SubCategoryID",
                         column: x => x.SubCategoryID,
                         principalTable: "SubCategories",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -245,13 +236,14 @@ namespace frutility_backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<string>(nullable: true),
                     ProductId = table.Column<int>(nullable: false),
                     Quantity = table.Column<int>(nullable: false),
                     OrderDate = table.Column<DateTime>(nullable: false),
                     PaymentMethod = table.Column<string>(nullable: true),
-                    OrderStatus = table.Column<string>(nullable: true)
+                    OrderStatus = table.Column<string>(nullable: true),
+                    Remarks = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -275,13 +267,10 @@ namespace frutility_backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     ProductId = table.Column<int>(nullable: false),
                     Quality = table.Column<int>(nullable: false),
-                    Price = table.Column<int>(nullable: false),
-                    Value = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    Summary = table.Column<string>(nullable: true),
                     Review = table.Column<string>(nullable: true),
                     ReviewDate = table.Column<DateTime>(nullable: false)
                 },
@@ -292,6 +281,33 @@ namespace frutility_backend.Migrations
                         name: "FK_ProductReviews_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Wishlists",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<string>(nullable: true),
+                    ProductId = table.Column<int>(nullable: false),
+                    PostingDate = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Wishlists", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Wishlists_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Wishlists_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -305,8 +321,7 @@ namespace frutility_backend.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -332,8 +347,7 @@ namespace frutility_backend.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_ProductId",
@@ -351,11 +365,6 @@ namespace frutility_backend.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_CategoryID",
-                table: "Products",
-                column: "CategoryID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Products_SubCategoryID",
                 table: "Products",
                 column: "SubCategoryID");
@@ -364,6 +373,16 @@ namespace frutility_backend.Migrations
                 name: "IX_SubCategories_CategoryID",
                 table: "SubCategories",
                 column: "CategoryID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wishlists_ProductId",
+                table: "Wishlists",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wishlists_UserId",
+                table: "Wishlists",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -390,13 +409,16 @@ namespace frutility_backend.Migrations
                 name: "ProductReviews");
 
             migrationBuilder.DropTable(
+                name: "Wishlists");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "SubCategories");
