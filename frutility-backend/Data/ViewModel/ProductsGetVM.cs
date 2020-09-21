@@ -13,7 +13,7 @@ namespace frutility_backend.Data.ViewModel
         public string Vendor { get; set; }
         public double Price { get; set; }
         public double? PriceBeforeDiscount { get; set; }
-        public List<byte[]> ImageBytes { get; set; }
+        public string imageURI { get; set; }
         public double ShippingCharges { get; set; }
         public bool Availability { get; set; }
         public int Stock { get; set; }

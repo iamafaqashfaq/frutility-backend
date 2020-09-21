@@ -25,6 +25,7 @@ namespace frutility_backend.Controllers
     {
         private readonly DataContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly string route = "https://192.168.2.127:5001/api/products/";
 
         public ProductsController(DataContext context, IWebHostEnvironment hostingEnvironment)
         {
@@ -41,13 +42,9 @@ namespace frutility_backend.Controllers
             List<ProductsGetVM> productget = new List<ProductsGetVM>();
             foreach (var product in products)
             {
-                List<byte[]> imageBytes = new List<byte[]>();
                 if (product.Image1 != null)
                 {
-                    string path = "Assets/images/" + product.Image1;
-                    string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
-                    byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-                    imageBytes.Add(bytes);
+                    
                     productget.Add(new ProductsGetVM
                     {
                         Id = product.Id,
@@ -56,7 +53,7 @@ namespace frutility_backend.Controllers
                         Vendor = product.Vendor,
                         Price = product.Price,
                         PriceBeforeDiscount = product.PriceBeforeDiscount,
-                        ImageBytes = imageBytes,
+                        imageURI = route + product.Image1,
                         ShippingCharges = product.ShippingCharges,
                         Availability = product.Availability,
                         Stock = product.Stock,
@@ -69,19 +66,22 @@ namespace frutility_backend.Controllers
             }
             return Ok(productget);
         }
+        [HttpGet("{filename}")]
+        public async Task<IActionResult> GetImages(string filename)
+        {
+            string path = "Assets/images/" + filename;
+            string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+            byte[] b = await System.IO.File.ReadAllBytesAsync(filepath);
+            return File(b, "image/jpeg");
+        }
 
         //Get single product with single image
         [HttpGet("productbyid/{id}")]
         public async Task<ActionResult<ProductsGetVM>> GetProductMinById(int id)
         {
-            Products model = _context.Products.FirstOrDefault(p => p.Id == id);
-            List<byte[]> imageBytes = new List<byte[]>();
+            Products model = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (model.Image1 != null)
             {
-                string path = "Assets/images/" + model.Image1;
-                string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
-                byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-                imageBytes.Add(bytes);
                 ProductsGetVM productsGet = new ProductsGetVM
                 {
                     Id = model.Id,
@@ -90,7 +90,7 @@ namespace frutility_backend.Controllers
                     Vendor = model.Vendor,
                     Price = model.Price,
                     PriceBeforeDiscount = model.PriceBeforeDiscount,
-                    ImageBytes = imageBytes,
+                    imageURI = model.Image1,
                     ShippingCharges = model.ShippingCharges,
                     Availability = model.Availability,
                     Stock = model.Stock,

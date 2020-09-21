@@ -16,8 +16,6 @@ namespace frutility_backend.Data.ViewModel
         public double Price { get; set; }
         public double? PriceBeforeDiscount { get; set; }
         public IFormFile Image1 { get; set; }
-        public IFormFile Image2 { get; set; }
-        public IFormFile Image3 { get; set; }
         public double ShippingCharges { get; set; }
         public bool Availability { get; set; }
         public int Stock { get; set; }

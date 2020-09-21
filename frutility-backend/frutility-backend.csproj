@@ -6,13 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Assests\**" />
-    <Content Remove="Assests\**" />
-    <EmbeddedResource Remove="Assests\**" />
-    <None Remove="Assests\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Migrations\20200808104232_ChangeInDatabase.cs" />
     <Compile Remove="Migrations\20200808104232_ChangeInDatabase.Designer.cs" />
   </ItemGroup>
