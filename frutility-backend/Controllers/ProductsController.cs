@@ -25,7 +25,7 @@ namespace frutility_backend.Controllers
     {
         private readonly DataContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly string route = "https://192.168.2.127:5001/api/products/";
+        private readonly string route = "https://10.0.2.2:5001/api/products/";
 
         public ProductsController(DataContext context, IWebHostEnvironment hostingEnvironment)
         {

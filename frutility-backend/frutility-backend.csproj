@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>frutility_backend</RootNamespace>
+    <UserSecretsId>9a813636-d325-4fce-b458-133b982abdee</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
