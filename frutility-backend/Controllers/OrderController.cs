@@ -214,17 +214,9 @@ namespace frutility_backend.Controllers
         [HttpGet]
         public async Task<ActionResult> GetUserOrderCount()
         {
-            if (Request.Headers.ContainsKey("Authorization"))
-            {
-                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
-                string strtoken = String.Concat(token);
-                strtoken = strtoken.Replace("Bearer ", "");
-                var result = gettoken(strtoken);
-                var order = await _context.Orders.Where(u => u.UserId == result.Result 
+            var order = await _context.Orders.Where(u => u.UserId == User.Identity.Name
                 && u.OrderStatus == "NOTCONFIRMED").CountAsync();
-                return Ok(order);
-            }
-            return Ok(false);
+            return Ok(order);
         }
 
         //Get: api/orders/shoppingcart
@@ -233,43 +225,35 @@ namespace frutility_backend.Controllers
         [HttpGet]
         public async Task<ActionResult> GetShoppingCartItems()
         {
-            if (Request.Headers.ContainsKey("Authorization"))
-            {
-                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
-                string strtoken = String.Concat(token);
-                strtoken = strtoken.Replace("Bearer ", "");
-                var result = gettoken(strtoken);
-                var orderdetail = await _context.Orders
-                    .Include(p => p.Products).Where(u=>u.UserId == result.Result && 
+            var orderdetail = await _context.Orders
+                    .Include(p => p.Products).Where(u => u.UserId == User.Identity.Name &&
                     u.OrderStatus == "NOTCONFIRMED").ToListAsync();
-                List<OrderCartVM> orders = new List<OrderCartVM>();
-                foreach(var order in orderdetail)
+            List<OrderCartVM> orders = new List<OrderCartVM>();
+            foreach (var order in orderdetail)
+            {
+                List<byte[]> imageBytes = new List<byte[]>();
+                if (order.Products.Image1 != null)
                 {
-                    List<byte[]> imageBytes = new List<byte[]>();
-                    if (order.Products.Image1 != null)
+                    string path = "Assets/images/" + order.Products.Image1;
+                    string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
+                    byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+                    imageBytes.Add(bytes);
+                    orders.Add(new OrderCartVM
                     {
-                        string path = "Assets/images/" + order.Products.Image1;
-                        string filepath = Path.Combine(_hostingEnvironment.ContentRootPath, path);
-                        byte[] bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-                        imageBytes.Add(bytes);
-                        orders.Add(new OrderCartVM
-                        {
-                            Id = order.Id,
-                            UserId = order.UserId,
-                            ProductId = order.ProductId,
-                            Quantity = order.Quantity,
-                            OrderDate = order.OrderDate,
-                            PaymentMethod = order.PaymentMethod,
-                            OrderStatus = order.OrderStatus,
-                            ApplicationUser = order.ApplicationUser,
-                            Products = order.Products,
-                            ImageBytes = imageBytes
-                        });
-                    }
+                        Id = order.Id,
+                        UserId = order.UserId,
+                        ProductId = order.ProductId,
+                        Quantity = order.Quantity,
+                        OrderDate = order.OrderDate,
+                        PaymentMethod = order.PaymentMethod,
+                        OrderStatus = order.OrderStatus,
+                        ApplicationUser = order.ApplicationUser,
+                        Products = order.Products,
+                        ImageBytes = imageBytes
+                    });
                 }
-                return Ok(orders);
             }
-            return Ok(false);
+            return Ok(orders);
         }
 
         //POST: api/orders
@@ -310,32 +294,14 @@ namespace frutility_backend.Controllers
             return Ok(false);
         }
 
-        //Get userroles through recieved token
-        public async Task<string> gettoken(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var tokens = handler.ReadToken(token) as JwtSecurityToken;
-            var decoded = tokens.Claims.FirstOrDefault(t => t.Type == "unique_name");
-            var user = await _userManager.FindByIdAsync(decoded.Value);
-            return user.Id;
-        }
         //PUT: api/orders/
         [Authorize]
         [HttpPut]
         public async Task<ActionResult<Order>> UpdateOrder()
         {
-            if (Request.Headers.ContainsKey("Authorization"))
-            {
-                string[] token = Request.Headers.GetCommaSeparatedValues("Authorization");
-                string strtoken = String.Concat(token);
-                strtoken = strtoken.Replace("Bearer ", "");
-                var result = gettoken(strtoken);
-                string userId = result.Result;
-                _context.Orders.Where(u => u.UserId == userId).ToList().ForEach(o => o.OrderStatus = "PENDING");
-                await _context.SaveChangesAsync();
-                return Ok(true);
-            }
-            return NoContent();
+            _context.Orders.Where(u => u.UserId == User.Identity.Name).ToList().ForEach(o => o.OrderStatus = "PENDING");
+            await _context.SaveChangesAsync();
+            return Ok(true);
         }
 
         //Delete: api/orders/{id}
