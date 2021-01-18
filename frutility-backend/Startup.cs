@@ -47,7 +47,7 @@ namespace frutility_backend
             //Adding DATABASE
             string connection = Configuration.GetConnectionString("Default");
             services.AddControllers();
-            services.AddDbContext<DataContext>(options => options.UseSqlite(connection));
+            services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
              {
                  options.Password.RequireDigit = false;
